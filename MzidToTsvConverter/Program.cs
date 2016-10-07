@@ -2,13 +2,14 @@
 
 namespace MzidToTsvConverter
 {
-    public class Program
+    public static class Program
     {
         static void Main(string[] args)
         {
             var options = new ConverterOptions();
             if (!options.ProcessArgs(args))
             {
+                System.Threading.Thread.Sleep(1500);
                 return;
             }
 
@@ -16,12 +17,15 @@ namespace MzidToTsvConverter
 
             try
             {
-                MzidToTsvConverter.ConvertToTsv(options);
-                System.Console.WriteLine("Conversion finished!");
+                var converter = new MzidToTsvConverter();
+                converter.ConvertToTsv(options);
+                Console.WriteLine("Conversion finished!");
+                System.Threading.Thread.Sleep(700);
             }
             catch (Exception e)
             {
-                System.Console.WriteLine("Conversion failed: " + e.Message);
+                Console.WriteLine("Conversion failed: " + e.Message);
+                System.Threading.Thread.Sleep(1500);
             }
         }
     }

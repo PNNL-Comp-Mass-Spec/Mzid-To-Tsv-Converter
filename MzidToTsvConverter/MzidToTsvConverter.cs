@@ -8,12 +8,12 @@ namespace MzidToTsvConverter
 {
     public class MzidToTsvConverter
     {
-        public static void ConvertToTsv(ConverterOptions options)
+        public void ConvertToTsv(ConverterOptions options)
         {
             ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults);
         }
 
-        public static void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true)
+        public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true)
         {
             var reader = new SimpleMZIdentMLReader();
             var data = reader.Read(mzidPath);
@@ -21,7 +21,7 @@ namespace MzidToTsvConverter
             var headers = "#SpecFile\tSpecID\tScanNum\tFragMethod\tPrecursor\tIsotopeError\tPrecursorError(ppm)\tCharge\tPeptide\tProtein\tDeNovoScore\tMSGFScore\tSpecEValue\tEValue\tQValue\tPepQValue";
             //var format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}";
 
-            using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.Read)))
+            using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
             {
                 stream.WriteLine(headers);
                 foreach (var id in data.Identifications)
@@ -78,6 +78,8 @@ namespace MzidToTsvConverter
                         var eValueString = StringUtilities.DblToString(eValue, 5, true, 0.001);
                         var qValueString = StringUtilities.DblToString(qValue, 5);
                         var pepQValueString = StringUtilities.DblToString(pepQValue, 5);
+
+                        // Auto change QValue from 0 or 1 to 0.0 or 1.0
                         if (!qValueString.Contains(".") && !qValueString.ToLower().Contains("e"))
                         {
                             qValueString = qValueString + ".0";
@@ -86,6 +88,7 @@ namespace MzidToTsvConverter
                         {
                             pepQValueString = pepQValueString + ".0";
                         }
+
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                             specFile, specId,
