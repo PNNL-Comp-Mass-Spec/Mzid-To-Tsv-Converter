@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using PNNLOmics.Utilities;
 using PSI_Interface.IdentData;
 
 namespace MzidToTsvConverter
@@ -17,7 +19,7 @@ namespace MzidToTsvConverter
             var data = reader.Read(mzidPath);
 
             var headers = "#SpecFile\tSpecID\tScanNum\tFragMethod\tPrecursor\tIsotopeError\tPrecursorError(ppm)\tCharge\tPeptide\tProtein\tDeNovoScore\tMSGFScore\tSpecEValue\tEValue\tQValue\tPepQValue";
-            var format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}";
+            //var format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}";
 
             using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
@@ -63,9 +65,25 @@ namespace MzidToTsvConverter
                         {
                             continue;
                         }
-                        stream.WriteLine("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}", specFile, specId,
+                        /*var line = string.Format(CultureInfo.InvariantCulture,
+                            "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:G6}\t{13:G6}\t{14:0.0####}\t{15:0.0####}",
+                            specFile, specId,
                             scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValue,
                             eValue, qValue, pepQValue);
+                        stream.WriteLine(line);*/
+                        /*stream.WriteLine(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:0.0####}\t{13:0.0####}\t{14:0.0####}\t{15:0.0####}", specFile, specId,
+                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValue,
+                            eValue, qValue, pepQValue);*/
+                        var specEValueString = StringUtilities.DblToString(specEValue, 5, true, 0.001);
+                        var eValueString = StringUtilities.DblToString(eValue, 5, true, 0.001);
+                        var qValueString = StringUtilities.DblToString(qValue, 5);
+                        var pepQValueString = StringUtilities.DblToString(pepQValue, 5);
+                        var line = string.Format(CultureInfo.InvariantCulture,
+                            "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
+                            specFile, specId,
+                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValueString,
+                            eValueString, qValueString, pepQValueString);
+                        stream.WriteLine(line);
 
                         if (!unrollResults)
                         {

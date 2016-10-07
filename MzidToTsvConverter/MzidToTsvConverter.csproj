@@ -37,6 +37,9 @@
     <Reference Include="Arguments">
       <HintPath>..\lib\Arguments\Arguments.dll</HintPath>
     </Reference>
+    <Reference Include="PNNLOmics">
+      <HintPath>..\lib\PNNLOmics.dll</HintPath>
+    </Reference>
     <Reference Include="PSI_Interface">
       <HintPath>..\lib\PSI_Interface.dll</HintPath>
     </Reference>
