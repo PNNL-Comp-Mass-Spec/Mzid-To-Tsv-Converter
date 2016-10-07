@@ -78,6 +78,14 @@ namespace MzidToTsvConverter
                         var eValueString = StringUtilities.DblToString(eValue, 5, true, 0.001);
                         var qValueString = StringUtilities.DblToString(qValue, 5);
                         var pepQValueString = StringUtilities.DblToString(pepQValue, 5);
+                        if (!qValueString.Contains(".") && !qValueString.ToLower().Contains("e"))
+                        {
+                            qValueString = qValueString + ".0";
+                        }
+                        if (!pepQValueString.Contains(".") && !pepQValueString.ToLower().Contains("e"))
+                        {
+                            pepQValueString = pepQValueString + ".0";
+                        }
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                             specFile, specId,
