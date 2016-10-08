@@ -59,9 +59,11 @@ namespace MzidToTsvConverter
                 return false;
             }
 
-            if (!File.Exists(MzidPath))
+            var mzidFile = new FileInfo(MzidPath);
+            if (!mzidFile.Exists)
             {
                 Console.WriteLine("ERROR: mzid file does not exist!");
+                Console.WriteLine(mzidFile.FullName);
                 return false;
             }
 
