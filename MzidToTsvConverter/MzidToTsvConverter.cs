@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using PNNLOmics.Utilities;
@@ -52,6 +53,9 @@ namespace MzidToTsvConverter
                     var qValue = id.QValue;
                     var pepQValue = id.PepQValue;
 
+                    // This will have the peptide with any numeric mods, but without prefix or suffix residues
+                    var peptideWithMods = id.Peptide.SequenceWithNumericMods;
+
                     var dedup = new HashSet<string>();
                     foreach (var pepEv in id.PepEvidence)
                     {
@@ -59,9 +63,14 @@ namespace MzidToTsvConverter
                         {
                             continue;
                         }
-                        var peptide = pepEv.SequenceWithNumericMods;
+
+                        // Add the prefix and suffix residues for this protein
+                        // Do not use pepEv.SequenceWithNumericMods; it isn't necessarily correct for this spectrum
+                        var peptideWithModsAndContext = pepEv.Pre + "." + peptideWithMods + "." + pepEv.Post;
+                        
+
                         var protein = pepEv.DbSeq.Accession;
-                        if (!dedup.Add(peptide + protein))
+                        if (!dedup.Add(peptideWithModsAndContext + protein))
                         {
                             continue;
                         }
@@ -92,7 +101,7 @@ namespace MzidToTsvConverter
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                             specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValueString,
+                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValueString,
                             eValueString, qValueString, pepQValueString);
                         stream.WriteLine(line);
 
