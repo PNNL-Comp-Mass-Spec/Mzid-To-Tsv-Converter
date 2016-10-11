@@ -27935,6 +27935,12 @@
             If the modification location is unknown e.g. for PMF data, this attribute should be omitted.
             (See mzIdentML specification, version 1.1.0)</remarks>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.SequenceWithNumericMods">
+            <summary>
+            Peptide sequence with numeric mods but without a prefix or suffix residue
+            For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
+            </summary>
+        </member>
         <member name="T:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence">
             <summary>
             Peptide result information
@@ -27974,7 +27980,7 @@
         </member>
         <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideEvidence.SequenceWithNumericMods">
             <summary>
-            Peptide sequence with ends and numeric mods; uses the first peptide evidence to get pre and post residues.
+            Peptide sequence with numeric mods and prefix/suffix residues
             For the sequence without mods, use <see cref="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.PeptideRef.Sequence"/>
             </summary>
         </member>
@@ -28009,6 +28015,21 @@
             Name of the spectrum file used for the search
             </summary>
         </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftware">
+            <summary>
+            Get the name of the analysis software
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareCvAccession">
+            <summary>
+            Get the Controlled Vocabulary accession of the analysis software, if available
+            </summary>
+        </member>
+        <member name="P:PSI_Interface.IdentData.SimpleMZIdentMLReader.SimpleMZIdentMLData.AnalysisSoftwareVersion">
+            <summary>
+            Get the version of the analysis software, if provided
+            </summary>
+        </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.Read(System.String)">
             <summary>
             Entry point for SimpleMZIdentMLReader
@@ -28033,6 +28054,20 @@
             Files are commonly larger than 30 MB, so use a streaming reader instead of a DOM reader
             </summary>
             <param name="reader">XmlReader object for the file to be read</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftwareList(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftwareList element
+            Called by ReadMzIdentML (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the single AnalysisSoftwareList element</param>
+        </member>
+        <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadAnalysisSoftware(System.Xml.XmlReader)">
+            <summary>
+            Handle the child nodes of the AnalysisSoftware element
+            Called by ReadAnalysisSoftwareList (xml hierarchy)
+            </summary>
+            <param name="reader">XmlReader that is only valid for the scope of the AnalysisSoftware element</param>
         </member>
         <member name="M:PSI_Interface.IdentData.SimpleMZIdentMLReader.ReadSequenceCollection(System.Xml.XmlReader)">
             <summary>

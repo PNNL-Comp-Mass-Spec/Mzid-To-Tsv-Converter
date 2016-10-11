@@ -22,6 +22,34 @@ namespace MzidToTsvConverter
             var headers = "#SpecFile\tSpecID\tScanNum\tFragMethod\tPrecursor\tIsotopeError\tPrecursorError(ppm)\tCharge\tPeptide\tProtein\tDeNovoScore\tMSGFScore\tSpecEValue\tEValue\tQValue\tPepQValue";
             //var format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}";
 
+            // SPECIAL CASE:
+            // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
+            // SpectrumIdentificationItems was correct, but if there was a modification in the first 3 residues there was at
+            // least a 50% chance of the PeptideEvidenceRefs within the SpectrumIdentificationItem being incorrect. So, for
+            // those bad versions, use the peptide_ref rather than the PeptideEvidenceRefs to get the sequence.
+            var isBadMsGfMzid = false;
+            if (data.AnalysisSoftwareCvAccession.ToUpper().Contains("MS:1002048") && !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
+            {
+                // bad versions: v10280 (introduced), v10282, v2016.01.20, v2016.01.21, v2016.01.29, v2016.02.12, v2016.05.25, v2016.0.13, v2016.06.13, v2016.06.14, v2016.06.15, v2016.06.29, v2016.07.26, v2016.08.31, v2016.09.07, v2016.09.22, v2016.09.23 (fixed with version v2016.10.10)
+                var badVersions = new string[]
+                {
+                    "v10280", "v10282", "v2016.01.20", "v2016.01.21", "v2016.01.29", "v2016.02.12", "v2016.05.25", "v2016.0.13", "v2016.06.13", "v2016.06.14",
+                    "v2016.06.15", "v2016.06.29", "v2016.07.26", "v2016.08.31", "v2016.09.07", "v2016.09.22", "v2016.09.23"
+                };
+                foreach (var version in badVersions)
+                {
+                    if (data.AnalysisSoftwareVersion.Contains(version))
+                    {
+                        isBadMsGfMzid = true;
+                    }
+                }
+            }
+            if (isBadMsGfMzid)
+            {
+                Console.WriteLine("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
+                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath);
+            }
+
             using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
             {
                 stream.WriteLine(headers);
@@ -53,9 +81,6 @@ namespace MzidToTsvConverter
                     var qValue = id.QValue;
                     var pepQValue = id.PepQValue;
 
-                    // This will have the peptide with any numeric mods, but without prefix or suffix residues
-                    var peptideWithMods = id.Peptide.SequenceWithNumericMods;
-
                     var dedup = new HashSet<string>();
                     foreach (var pepEv in id.PepEvidence)
                     {
@@ -64,10 +89,14 @@ namespace MzidToTsvConverter
                             continue;
                         }
 
-                        // Add the prefix and suffix residues for this protein
-                        // Do not use pepEv.SequenceWithNumericMods; it isn't necessarily correct for this spectrum
-                        var peptideWithModsAndContext = pepEv.Pre + "." + peptideWithMods + "." + pepEv.Post;
-                        
+                        var peptideWithModsAndContext = pepEv.SequenceWithNumericMods;
+                        // Produce correct output with bad MS-GF+ mzid
+                        if (isBadMsGfMzid)
+                        {
+                            // Add the prefix and suffix residues for this protein
+                            // Do not use pepEv.SequenceWithNumericMods; it isn't necessarily correct for this spectrum
+                            peptideWithModsAndContext = pepEv.Pre + "." + id.Peptide.SequenceWithNumericMods + "." + pepEv.Post;
+                        }
 
                         var protein = pepEv.DbSeq.Accession;
                         if (!dedup.Add(peptideWithModsAndContext + protein))
@@ -77,20 +106,19 @@ namespace MzidToTsvConverter
                         /*var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:G6}\t{13:G6}\t{14:0.0####}\t{15:0.0####}",
                             specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValue,
+                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValue,
                             eValue, qValue, pepQValue);
                         stream.WriteLine(line);*/
                         /*stream.WriteLine(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:0.0####}\t{13:0.0####}\t{14:0.0####}\t{15:0.0####}", specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptide, protein, deNovoScore, msgfScore, specEValue,
+                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValue,
                             eValue, qValue, pepQValue);*/
                         var specEValueString = StringUtilities.DblToString(specEValue, 5, true, 0.001);
                         var eValueString = StringUtilities.DblToString(eValue, 5, true, 0.001);
 
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14:0.0####}\t{15:0.0####}",
-                            specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValueString,
-                            eValueString, qValue, pepQValue);
+                            specFile, specId, scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein,
+                            deNovoScore, msgfScore, specEValueString, eValueString, qValue, pepQValue);
                         stream.WriteLine(line);
 
                         if (!unrollResults)
