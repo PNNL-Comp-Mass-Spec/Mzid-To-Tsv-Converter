@@ -19,8 +19,11 @@ namespace MzidToTsvConverter
             var reader = new SimpleMZIdentMLReader();
             var data = reader.Read(mzidPath);
 
-            var headers = "#SpecFile\tSpecID\tScanNum\tFragMethod\tPrecursor\tIsotopeError\tPrecursorError(ppm)\tCharge\tPeptide\tProtein\tDeNovoScore\tMSGFScore\tSpecEValue\tEValue\tQValue\tPepQValue";
-            //var format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}";
+            var headers = new List<string> {
+                "#SpecFile", "SpecID", "ScanNum", "FragMethod",
+                "Precursor", "IsotopeError", "PrecursorError(ppm)", "Charge",
+                "Peptide", "Protein", "DeNovoScore", "MSGFScore",
+                "SpecEValue", "EValue", "QValue", "PepQValue" };
 
             // SPECIAL CASE:
             // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
@@ -46,13 +49,21 @@ namespace MzidToTsvConverter
             }
             if (isBadMsGfMzid)
             {
-                Console.WriteLine("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
-                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath);
+                ShowWarning(string.Format("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
+                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath));
             }
 
             using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
             {
-                stream.WriteLine(headers);
+                stream.WriteLine(string.Join("\t", headers));
+
+                if (data.Identifications.Count == 0)
+                {
+                    ShowWarning("Warning: .mzID file does not have any results");
+                    System.Threading.Thread.Sleep(1500);
+                    return;
+                }
+
                 foreach (var id in data.Identifications)
                 {
                     var specFile = data.SpectrumFile;
@@ -133,5 +144,16 @@ namespace MzidToTsvConverter
         public const double C = 12.0f;
         public const double C13 = 13.00335483;
         public const double IsotopeMass = C13 - C;
+
+        private void ShowWarning(string warningMessage)
+        {
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(warningMessage);
+            Console.ResetColor();
+            Console.WriteLine();
+        }
     }
+
+ 
 }
