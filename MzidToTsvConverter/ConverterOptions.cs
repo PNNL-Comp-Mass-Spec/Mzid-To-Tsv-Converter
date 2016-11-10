@@ -30,6 +30,8 @@ namespace MzidToTsvConverter
             Console.WriteLine("\t'-tsv:path' - path to tsv file to be written; if not specified, will be output to same location as mzid");
             Console.WriteLine("\t'-unroll|-u' signifies that results should be unrolled - one line per unique peptide/protein combination in each spectrum identification");
             Console.WriteLine("\t'-showDecoy|-sd' signifies that decoy results should be included in the result tsv");
+
+            System.Threading.Thread.Sleep(1500);
         }
 
         public bool ProcessArgs(string[] args)
@@ -48,7 +50,12 @@ namespace MzidToTsvConverter
                 .AddArgument("showDecoy", "sd").WithAction(param => { ShowDecoy = true; })
                 .Process();
             
-            return ValidateArgs();
+            if (ValidateArgs())
+                return true;
+
+            Console.WriteLine();
+            ShowUsage();
+            return false;
         }
 
         private bool ValidateArgs()
