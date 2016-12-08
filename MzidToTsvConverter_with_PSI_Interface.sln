@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MzidToTsvConverter", "MzidToTsvConverter\MzidToTsvConverter_with_PSI_Interface.csproj", "{24F9C116-C034-4979-818A-917B2AA0B827}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PSI_Interface", "..\PSI_Interface\PSI_Interface\PSI_Interface.csproj", "{96F29CF8-7B30-471C-BCAB-C15C87D7DBB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24F9C116-C034-4979-818A-917B2AA0B827}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24F9C116-C034-4979-818A-917B2AA0B827}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24F9C116-C034-4979-818A-917B2AA0B827}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24F9C116-C034-4979-818A-917B2AA0B827}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F29CF8-7B30-471C-BCAB-C15C87D7DBB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F29CF8-7B30-471C-BCAB-C15C87D7DBB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F29CF8-7B30-471C-BCAB-C15C87D7DBB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F29CF8-7B30-471C-BCAB-C15C87D7DBB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
