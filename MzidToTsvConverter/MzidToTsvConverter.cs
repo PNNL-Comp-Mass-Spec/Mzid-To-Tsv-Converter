@@ -11,10 +11,10 @@ namespace MzidToTsvConverter
     {
         public void ConvertToTsv(ConverterOptions options)
         {
-            ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults);
+            ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum);
         }
 
-        public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true)
+        public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true, bool singleResult = false)
         {
             var reader = new SimpleMZIdentMLReader();
             var data = reader.Read(mzidPath);
@@ -64,8 +64,14 @@ namespace MzidToTsvConverter
                     return;
                 }
 
+                var lastScanNum = 0;
                 foreach (var id in data.Identifications)
                 {
+                    if (singleResult && id.ScanNum == lastScanNum)
+                    {
+                        continue;
+                    }
+                    lastScanNum = id.ScanNum;
                     var specFile = data.SpectrumFile;
                     var specId = id.NativeId;
                     var scanNum = id.ScanNum;
@@ -154,6 +160,4 @@ namespace MzidToTsvConverter
             Console.WriteLine();
         }
     }
-
- 
 }

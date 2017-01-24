@@ -20,6 +20,8 @@ namespace MzidToTsvConverter
         public bool UnrollResults { get; set; }
         public bool ShowDecoy { get; set; }
 
+        public bool SingleResultPerSpectrum { get; set; }
+
         public void ShowUsage()
         {
             Console.WriteLine("Mzid to Tsv Converter");
@@ -30,6 +32,7 @@ namespace MzidToTsvConverter
             Console.WriteLine("\t'-tsv:path' - path to tsv file to be written; if not specified, will be output to same location as mzid");
             Console.WriteLine("\t'-unroll|-u' signifies that results should be unrolled - one line per unique peptide/protein combination in each spectrum identification");
             Console.WriteLine("\t'-showDecoy|-sd' signifies that decoy results should be included in the result tsv");
+            Console.WriteLine("\t'-singleResult|-1' Only output one result per spectrum");
 
             System.Threading.Thread.Sleep(1500);
         }
@@ -48,8 +51,9 @@ namespace MzidToTsvConverter
                 .AddArgument("tsv").WithAction(param => { TsvPath = param; })
                 .AddArgument("unroll", "u").WithAction(param => { UnrollResults = true; })
                 .AddArgument("showDecoy", "sd").WithAction(param => { ShowDecoy = true; })
+                .AddArgument("singleResult", "1").WithAction(param => { SingleResultPerSpectrum = true; })
                 .Process();
-            
+
             if (ValidateArgs())
                 return true;
 
@@ -94,6 +98,7 @@ namespace MzidToTsvConverter
             Console.WriteLine("tsv path: \"{0}\"", TsvPath);
             Console.WriteLine("unroll results: {0}", UnrollResults);
             Console.WriteLine("show decoy: {0}", ShowDecoy);
+            Console.WriteLine("single result per spectrum: {0}", SingleResultPerSpectrum);
         }
     }
 }
