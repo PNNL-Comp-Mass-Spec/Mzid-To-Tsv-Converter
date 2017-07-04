@@ -3,3 +3,4 @@ packages/
 */obj/
 *.user
 *.suo
+.vs/

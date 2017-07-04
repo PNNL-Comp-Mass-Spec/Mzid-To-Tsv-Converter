@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace MzidToTsvConverter
 {
@@ -6,6 +7,13 @@ namespace MzidToTsvConverter
     {
         static int Main(string[] args)
         {
+            //var optionsParser = CommandLine.Parser.Default.ParseArguments<ConverterOptions>(args);
+            //if (optionsParser.Errors.Any())
+            //{
+            //    //Console.WriteLine(optionsParser.Errors);
+            //    return;
+            //}
+            //var options = optionsParser.Value;
             var options = new ConverterOptions();
             if (!options.ProcessArgs(args))
             {
@@ -15,14 +23,17 @@ namespace MzidToTsvConverter
 
             options.OutputSetOptions();
 
+#if !DEBUG
             try
             {
+#endif
                 var converter = new MzidToTsvConverter();
                 converter.ConvertToTsv(options);
                 Console.WriteLine("Conversion finished!");
                 System.Threading.Thread.Sleep(700);
                 return 0;
-            }
+#if !DEBUG
+        }
             catch (Exception e)
             {
                 Console.WriteLine("Conversion failed: " + e.Message);
@@ -34,6 +45,7 @@ namespace MzidToTsvConverter
                     return -1;
                 return errorCode;
             }
+#endif
         }
     }
 }
