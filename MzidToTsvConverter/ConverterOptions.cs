@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using Arguments;
+using PRISM;
 
 namespace MzidToTsvConverter
 {
@@ -13,56 +12,25 @@ namespace MzidToTsvConverter
             TsvPath = "";
             UnrollResults = false;
             ShowDecoy = false;
+            SingleResultPerSpectrum = false;
         }
 
+        [Option("mzid", Required = true, HelpText = "Path to mzid[.gz] file; if path has spaces, it must be in quotes.")]
         public string MzidPath { get; set; }
+
+        [Option("tsv", HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid")]
         public string TsvPath { get; set; }
+
+        [Option("unroll", "u", HelpText = "Unroll the results - output one line per unique peptide/protein combination in each spectrum identification", HelpShowsDefault = true)]
         public bool UnrollResults { get; set; }
+
+        [Option("showDecoy", "sd", HelpText = "Include decoy results in the result tsv", HelpShowsDefault = true)]
         public bool ShowDecoy { get; set; }
 
+        [Option("singleResult", "1", HelpText = "Only output one result per spectrum", HelpShowsDefault = true)]
         public bool SingleResultPerSpectrum { get; set; }
 
-        public void ShowUsage()
-        {
-            Console.WriteLine("Mzid to Tsv Converter");
-            Console.WriteLine("Usage: {0} -mzid:\"mzid path\" [-tsv:\"tsv output path\"] [-unroll|-u] [-showDecoy|-sd]", System.Reflection.Assembly.GetEntryAssembly().GetName().Name);
-            Console.WriteLine("  Required parameters:");
-            Console.WriteLine("\t'-mzid:path' - path to mzid[.gz] file; if path has spaces, it must be in quotes.");
-            Console.WriteLine("  Optional parameters:");
-            Console.WriteLine("\t'-tsv:path' - path to tsv file to be written; if not specified, will be output to same location as mzid");
-            Console.WriteLine("\t'-unroll|-u' signifies that results should be unrolled - one line per unique peptide/protein combination in each spectrum identification");
-            Console.WriteLine("\t'-showDecoy|-sd' signifies that decoy results should be included in the result tsv");
-            Console.WriteLine("\t'-singleResult|-1' Only output one result per spectrum");
-
-            System.Threading.Thread.Sleep(1500);
-        }
-
-        public bool ProcessArgs(string[] args)
-        {
-            if (args.Length == 0)
-            {
-                ShowUsage();
-                return false;
-            }
-
-            var argProc = ArgumentProcessor.Initialize(args, new List<IArgument>())
-                .UsingParameterSeparator(':')
-                .AddArgument("mzid").WithAction(param => { MzidPath = param; })
-                .AddArgument("tsv").WithAction(param => { TsvPath = param; })
-                .AddArgument("unroll", "u").WithAction(param => { UnrollResults = true; })
-                .AddArgument("showDecoy", "sd").WithAction(param => { ShowDecoy = true; })
-                .AddArgument("singleResult", "1").WithAction(param => { SingleResultPerSpectrum = true; })
-                .Process();
-
-            if (ValidateArgs())
-                return true;
-
-            Console.WriteLine();
-            ShowUsage();
-            return false;
-        }
-
-        private bool ValidateArgs()
+        public bool ValidateArgs()
         {
             if (string.IsNullOrWhiteSpace(MzidPath))
             {

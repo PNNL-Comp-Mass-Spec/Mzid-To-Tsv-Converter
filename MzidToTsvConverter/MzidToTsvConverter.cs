@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using PNNLOmics.Utilities;
+using PRISM;
 using PSI_Interface.IdentData;
 
 namespace MzidToTsvConverter
@@ -129,8 +129,8 @@ namespace MzidToTsvConverter
                         /*stream.WriteLine(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:0.0####}\t{13:0.0####}\t{14:0.0####}\t{15:0.0####}", specFile, specId,
                             scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValue,
                             eValue, qValue, pepQValue);*/
-                        var specEValueString = StringUtilities.DblToString(specEValue, 5, true, 0.001);
-                        var eValueString = StringUtilities.DblToString(eValue, 5, true, 0.001);
+                        var specEValueString = StringUtilities.ValueToString(specEValue, 5, 0.001);
+                        var eValueString = StringUtilities.ValueToString(eValue, 5, 0.001);
 
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14:0.0####}\t{15:0.0####}",

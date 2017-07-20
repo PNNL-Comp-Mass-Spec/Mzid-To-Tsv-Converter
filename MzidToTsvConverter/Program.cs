@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq;
+using System.Reflection;
+using PRISM;
 
 namespace MzidToTsvConverter
 {
@@ -7,15 +8,11 @@ namespace MzidToTsvConverter
     {
         static int Main(string[] args)
         {
-            //var optionsParser = CommandLine.Parser.Default.ParseArguments<ConverterOptions>(args);
-            //if (optionsParser.Errors.Any())
-            //{
-            //    //Console.WriteLine(optionsParser.Errors);
-            //    return;
-            //}
-            //var options = optionsParser.Value;
             var options = new ConverterOptions();
-            if (!options.ProcessArgs(args))
+            var asmName = typeof(Program).GetTypeInfo().Assembly.GetName();
+            var programVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
+            var version = string.Format("version {0}.{1}.{2}", programVersion.Major, programVersion.Minor, programVersion.Build);
+            if (!CommandLineParser<ConverterOptions>.ParseArgs(args, options, asmName.Name, version) || !options.ValidateArgs())
             {
                 System.Threading.Thread.Sleep(1500);
                 return -1;
