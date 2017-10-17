@@ -153,11 +153,8 @@ namespace MzidToTsvConverter
 
         private void ShowWarning(string warningMessage)
         {
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(warningMessage);
-            Console.ResetColor();
-            Console.WriteLine();
+            ConsoleMsgUtils.ShowWarning(warningMessage);
+
         }
     }
 }
