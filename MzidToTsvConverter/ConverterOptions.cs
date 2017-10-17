@@ -30,6 +30,21 @@ namespace MzidToTsvConverter
         [Option("singleResult", "1", HelpText = "Only output one result per spectrum", HelpShowsDefault = true)]
         public bool SingleResultPerSpectrum { get; set; }
 
+        public string AutoNameTsvFromMzid(string mzidPath)
+        {
+            var path = mzidPath;
+            if (path.ToLower().EndsWith(".gz"))
+            {
+                path = Path.ChangeExtension(path, null);
+            }
+            return Path.ChangeExtension(path, "tsv");
+        }
+
+        public bool HasWildcard(string filePath)
+        {
+            return filePath.Contains("*") || filePath.Contains("?");
+        }
+
         public bool ValidateArgs()
         {
             if (string.IsNullOrWhiteSpace(MzidPath))
@@ -38,22 +53,20 @@ namespace MzidToTsvConverter
                 return false;
             }
 
-            var mzidFile = new FileInfo(MzidPath);
-            if (!mzidFile.Exists)
+            if (!HasWildcard(MzidPath))
             {
-                Console.WriteLine("ERROR: mzid file does not exist!");
-                Console.WriteLine(mzidFile.FullName);
-                return false;
+                var mzidFile = new FileInfo(MzidPath);
+                if (!mzidFile.Exists)
+                {
+                    Console.WriteLine("ERROR: mzid file does not exist!");
+                    Console.WriteLine(mzidFile.FullName);
+                    return false;
+                }
             }
 
             if (string.IsNullOrWhiteSpace(TsvPath))
             {
-                var path = MzidPath;
-                if (path.ToLower().EndsWith(".gz"))
-                {
-                    path = Path.ChangeExtension(path, null);
-                }
-                TsvPath = Path.ChangeExtension(path, "tsv");
+                TsvPath = AutoNameTsvFromMzid(MzidPath);
             }
 
             return true;
@@ -68,5 +81,6 @@ namespace MzidToTsvConverter
             Console.WriteLine("show decoy: {0}", ShowDecoy);
             Console.WriteLine("single result per spectrum: {0}", SingleResultPerSpectrum);
         }
+
     }
 }

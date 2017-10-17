@@ -11,7 +11,39 @@ namespace MzidToTsvConverter
     {
         public void ConvertToTsv(ConverterOptions options)
         {
-            ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum);
+            if (options.HasWildcard(options.MzidPath))
+            {
+                // Find matching files
+                var mzidFiles = clsPathUtils.FindFilesWildcard(options.MzidPath);
+
+                if (mzidFiles.Count == 0)
+                {
+                    ShowWarning("No mzid files were found with path spec " + options.MzidPath);
+                    return;
+                }
+
+                foreach (var mzidFile in mzidFiles)
+                {
+                    Console.WriteLine("Converting " + mzidFile.FullName);
+
+                    string tsvPath;
+                    if (options.HasWildcard(options.TsvPath))
+                    {
+                        tsvPath = options.AutoNameTsvFromMzid(mzidFile.FullName);
+                    }
+                    else
+                    {
+                        tsvPath = options.TsvPath;
+                    }
+
+                    ConvertToTsv(mzidFile.FullName, tsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum);
+                }
+
+            }
+            else
+            {
+                ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum);
+            }
         }
 
         public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true, bool singleResult = false)
