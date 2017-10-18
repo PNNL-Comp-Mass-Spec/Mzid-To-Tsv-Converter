@@ -15,10 +15,10 @@ namespace MzidToTsvConverter
             SingleResultPerSpectrum = false;
         }
 
-        [Option("mzid", Required = true, HelpText = "Path to mzid[.gz] file; if path has spaces, it must be in quotes.")]
+        [Option("mzid", Required = true, ArgPosition = 1, HelpText = "Path to mzid[.gz] file; if path has spaces, it must be in quotes.")]
         public string MzidPath { get; set; }
 
-        [Option("tsv", HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid")]
+        [Option("tsv", ArgPosition = 2, HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid")]
         public string TsvPath { get; set; }
 
         [Option("unroll", "u", HelpText = "Unroll the results - output one line per unique peptide/protein combination in each spectrum identification", HelpShowsDefault = true)]
