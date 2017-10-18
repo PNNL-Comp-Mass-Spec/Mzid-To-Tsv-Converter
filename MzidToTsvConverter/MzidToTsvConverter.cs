@@ -66,7 +66,7 @@ namespace MzidToTsvConverter
             if (data.AnalysisSoftwareCvAccession.ToUpper().Contains("MS:1002048") && !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
             {
                 // bad versions: v10280 (introduced), v10282, v2016.01.20, v2016.01.21, v2016.01.29, v2016.02.12, v2016.05.25, v2016.0.13, v2016.06.13, v2016.06.14, v2016.06.15, v2016.06.29, v2016.07.26, v2016.08.31, v2016.09.07, v2016.09.22, v2016.09.23 (fixed with version v2016.10.10)
-                var badVersions = new string[]
+                var badVersions = new[]
                 {
                     "v10280", "v10282", "v2016.01.20", "v2016.01.21", "v2016.01.29", "v2016.02.12", "v2016.05.25", "v2016.0.13", "v2016.06.13", "v2016.06.14",
                     "v2016.06.15", "v2016.06.29", "v2016.07.26", "v2016.08.31", "v2016.09.07", "v2016.09.22", "v2016.09.23"
@@ -97,6 +97,8 @@ namespace MzidToTsvConverter
                 }
 
                 var lastScanNum = 0;
+                var resultsWritten = 0;
+
                 foreach (var id in data.Identifications)
                 {
                     if (singleResult && id.ScanNum == lastScanNum)
@@ -131,6 +133,7 @@ namespace MzidToTsvConverter
                     var pepQValue = id.PepQValue;
 
                     var dedup = new HashSet<string>();
+
                     foreach (var pepEv in id.PepEvidence)
                     {
                         if (!showDecoy && pepEv.IsDecoy)
@@ -152,23 +155,33 @@ namespace MzidToTsvConverter
                         {
                             continue;
                         }
-                        /*var line = string.Format(CultureInfo.InvariantCulture,
-                            "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:G6}\t{13:G6}\t{14:0.0####}\t{15:0.0####}",
-                            specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValue,
-                            eValue, qValue, pepQValue);
-                        stream.WriteLine(line);*/
-                        /*stream.WriteLine(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:0.0####}\t{13:0.0####}\t{14:0.0####}\t{15:0.0####}", specFile, specId,
-                            scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein, deNovoScore, msgfScore, specEValue,
-                            eValue, qValue, pepQValue);*/
-                        var specEValueString = StringUtilities.ValueToString(specEValue, 5, 0.001);
-                        var eValueString = StringUtilities.ValueToString(eValue, 5, 0.001);
+
+                        // Write out EValues to 5 sig figs, using scientific notation below 0.0001
+                        var specEValueString = StringUtilities.ValueToString(specEValue, 5, 1000);
+                        var eValueString = StringUtilities.ValueToString(eValue, 5, 1000);
+
+                        // Write out QValue using 5 digits after the decimal, though use scientific notation below 0.00005
+                        var qValueString = StringUtilities.DblToString(qValue, 5, 0.00005);
+                        var pepQValueString = StringUtilities.DblToString(pepQValue, 5, 0.00005);
+
+                        if (resultsWritten == 0)
+                        {
+                            // Assure that the first row has 0.0 for score fields (helps in loading data into Access or SQL server)
+                            if (specEValueString == "0") specEValueString = "0.0";
+                            if (eValueString == "0") eValueString = "0.0";
+                            if (qValueString == "0") qValueString = "0.0";
+                            if (pepQValueString == "0") pepQValueString = "0.0";
+                        }
 
                         var line = string.Format(CultureInfo.InvariantCulture,
                             "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14:0.0####}\t{15:0.0####}",
                             specFile, specId, scanNum, fragMethod, precursor, isotopeError, precursorError, charge, peptideWithModsAndContext, protein,
-                            deNovoScore, msgfScore, specEValueString, eValueString, qValue, pepQValue);
+                            deNovoScore, msgfScore, specEValueString, eValueString, qValueString, pepQValueString);
+
                         stream.WriteLine(line);
+
+                        resultsWritten += 1;
+
 
                         if (!unrollResults)
                         {
