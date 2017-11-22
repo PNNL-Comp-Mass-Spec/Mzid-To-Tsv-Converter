@@ -1,9 +1,9 @@
 # MzidToTsvConverter
 
 ## Overview
-Converts an .mzid file created by MS-GF+ to a tab-delimited text file.  
+Converts an .mzid file created by MS-GF+ to a tab-delimited text file.
 
-Although MS-GF+ has this option (see [MzidToTsv.html](http://htmlpreview.github.io/?https://github.com/sangtaekim/msgfplus/blob/master/doc/MzidToTsv.html) ),  
+Although MS-GF+ has this option (see [MzidToTsv.html](http://htmlpreview.github.io/?https://github.com/sangtaekim/msgfplus/blob/master/doc/MzidToTsv.html) ),
 MzidToTsvConverter.exe can convert the .mzid file faster, using less memory.
 
 ## Details
@@ -30,3 +30,15 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-showDecoy` or `-sd`
 * Signifies that decoy results should be included in the output .tsv file.
 * Decoy results have protein names that start with XXX_
+
+## Contacts
+
+Written by Bryson Gibbons and Matthew Monroe for the Department of Energy (PNNL, Richland, WA) \
+E-mail: proteomics@pnnl.gov \
+Website: https://panomics.pnl.gov/ or https://omics.pnl.gov
+
+## License
+
+The MzidToTsvConverter is licensed under the Apache License, Version 2.0; 
+you may not use this file except in compliance with the License.  You may obtain 
+a copy of the License at https://opensource.org/licenses/Apache-2.0
