@@ -49,55 +49,51 @@ namespace MzidToTsvConverter
         public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true, bool singleResult = false)
         {
             var reader = new SimpleMZIdentMLReader();
-            var data = reader.Read(mzidPath);
-
-            var headers = new List<string> {
-                "#SpecFile", "SpecID", "ScanNum", "FragMethod",
-                "Precursor", "IsotopeError", "PrecursorError(ppm)", "Charge",
-                "Peptide", "Protein", "DeNovoScore", "MSGFScore",
-                "SpecEValue", "EValue", "QValue", "PepQValue" };
-
-            // SPECIAL CASE:
-            // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
-            // SpectrumIdentificationItems was correct, but if there was a modification in the first 3 residues there was at
-            // least a 50% chance of the PeptideEvidenceRefs within the SpectrumIdentificationItem being incorrect. So, for
-            // those bad versions, use the peptide_ref rather than the PeptideEvidenceRefs to get the sequence.
-            var isBadMsGfMzid = false;
-            if (data.AnalysisSoftwareCvAccession.ToUpper().Contains("MS:1002048") && !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
-            {
-                // bad versions: v10280 (introduced), v10282, v2016.01.20, v2016.01.21, v2016.01.29, v2016.02.12, v2016.05.25, v2016.0.13, v2016.06.13, v2016.06.14, v2016.06.15, v2016.06.29, v2016.07.26, v2016.08.31, v2016.09.07, v2016.09.22, v2016.09.23 (fixed with version v2016.10.10)
-                var badVersions = new[]
-                {
-                    "v10280", "v10282", "v2016.01.20", "v2016.01.21", "v2016.01.29", "v2016.02.12", "v2016.05.25", "v2016.0.13", "v2016.06.13", "v2016.06.14",
-                    "v2016.06.15", "v2016.06.29", "v2016.07.26", "v2016.08.31", "v2016.09.07", "v2016.09.22", "v2016.09.23"
-                };
-                foreach (var version in badVersions)
-                {
-                    if (data.AnalysisSoftwareVersion.Contains(version))
-                    {
-                        isBadMsGfMzid = true;
-                    }
-                }
-            }
-            if (isBadMsGfMzid)
-            {
-                ShowWarning(string.Format("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
-                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath));
-            }
-
+            using (var data = reader.ReadLowMem(mzidPath))
             using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
             {
-                stream.WriteLine(string.Join("\t", headers));
-
-                if (data.Identifications.Count == 0)
+                var headers = new List<string>
                 {
-                    ShowWarning("Warning: .mzID file does not have any results");
-                    System.Threading.Thread.Sleep(1500);
-                    return;
+                    "#SpecFile", "SpecID", "ScanNum", "FragMethod", "Precursor", "IsotopeError", "PrecursorError(ppm)", "Charge", "Peptide",
+                    "Protein", "DeNovoScore", "MSGFScore", "SpecEValue", "EValue", "QValue", "PepQValue"
+                };
+
+                // SPECIAL CASE:
+                // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
+                // SpectrumIdentificationItems was correct, but if there was a modification in the first 3 residues there was at
+                // least a 50% chance of the PeptideEvidenceRefs within the SpectrumIdentificationItem being incorrect. So, for
+                // those bad versions, use the peptide_ref rather than the PeptideEvidenceRefs to get the sequence.
+                var isBadMsGfMzid = false;
+                if (data.AnalysisSoftwareCvAccession.ToUpper().Contains("MS:1002048") && !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
+                {
+                    // bad versions: v10280 (introduced), v10282, v2016.01.20, v2016.01.21, v2016.01.29, v2016.02.12, v2016.05.25, v2016.0.13, v2016.06.13, v2016.06.14, v2016.06.15, v2016.06.29, v2016.07.26, v2016.08.31, v2016.09.07, v2016.09.22, v2016.09.23 (fixed with version v2016.10.10)
+                    var badVersions = new[]
+                    {
+                        "v10280", "v10282", "v2016.01.20", "v2016.01.21", "v2016.01.29", "v2016.02.12", "v2016.05.25", "v2016.0.13", "v2016.06.13",
+                        "v2016.06.14", "v2016.06.15", "v2016.06.29", "v2016.07.26", "v2016.08.31", "v2016.09.07", "v2016.09.22", "v2016.09.23"
+                    };
+                    foreach (var version in badVersions)
+                    {
+                        if (data.AnalysisSoftwareVersion.Contains(version))
+                        {
+                            isBadMsGfMzid = true;
+                        }
+                    }
                 }
+
+                if (isBadMsGfMzid)
+                {
+                    ShowWarning(string.Format(
+                        "Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
+                        " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.",
+                        mzidPath));
+                }
+
+                stream.WriteLine(string.Join("\t", headers));
 
                 var lastScanNum = 0;
                 var resultsWritten = 0;
+                var writtenCount = 0;
 
                 foreach (var id in data.Identifications)
                 {
@@ -105,6 +101,9 @@ namespace MzidToTsvConverter
                     {
                         continue;
                     }
+
+                    writtenCount++;
+
                     lastScanNum = id.ScanNum;
                     var specFile = data.SpectrumFile;
                     var specId = id.NativeId;
@@ -114,12 +113,14 @@ namespace MzidToTsvConverter
                     {
                         fragMethod = id.AllParamsDict["AssumedDissociationMethod"];
                     }
+
                     var precursor = id.ExperimentalMz;
                     var isotopeError = "0";
                     if (id.AllParamsDict.ContainsKey("IsotopeError"))
                     {
                         isotopeError = id.AllParamsDict["IsotopeError"];
                     }
+
                     var adjExpMz = id.ExperimentalMz - IsotopeMass * int.Parse(isotopeError) / id.Charge;
                     //var precursorError = (id.CalMz - id.ExperimentalMz) / id.CalMz * 1e6;
                     var precursorError = (adjExpMz - id.CalMz) / id.CalMz * 1e6;
@@ -188,6 +189,13 @@ namespace MzidToTsvConverter
                             break;
                         }
                     }
+                }
+
+                if (writtenCount == 0)
+                {
+                    ShowWarning("Warning: .mzID file does not have any results");
+                    System.Threading.Thread.Sleep(1500);
+                    return;
                 }
             }
         }
