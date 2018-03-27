@@ -30,6 +30,9 @@ namespace MzidToTsvConverter
         [Option("singleResult", "1", HelpText = "Only output one result per spectrum", HelpShowsDefault = true)]
         public bool SingleResultPerSpectrum { get; set; }
 
+        [Option("skipDupIds", HelpText = "If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.", HelpShowsDefault = true)]
+        public bool SkipDuplicateIds { get; set; }
+
         public string AutoNameTsvFromMzid(string mzidPath)
         {
             var path = mzidPath;
@@ -80,6 +83,10 @@ namespace MzidToTsvConverter
             Console.WriteLine("unroll results: {0}", UnrollResults);
             Console.WriteLine("show decoy: {0}", ShowDecoy);
             Console.WriteLine("single result per spectrum: {0}", SingleResultPerSpectrum);
+            if (SkipDuplicateIds)
+            {
+                Console.WriteLine("skipping duplicate IDs");
+            }
         }
 
     }
