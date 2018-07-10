@@ -38,7 +38,21 @@ namespace MzidToTsvConverter
 
                     ConvertToTsv(mzidFile.FullName, tsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum, options.SkipDuplicateIds);
                 }
+            }
+            else if (options.IsDirectory)
+            {
+                if (options.MzidPaths.Count == 0)
+                {
+                    var subdirsMessage = options.RecurseDirectories ? " or subdirectories" : "";
+                    ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subdirsMessage}.");
+                    return;
+                }
 
+                foreach (var mzidFile in options.MzidPaths)
+                {
+                    var tsvPath = options.AutoNameTsvFromMzid(mzidFile);
+                    ConvertToTsv(mzidFile, tsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum, options.SkipDuplicateIds);
+                }
             }
             else
             {
@@ -232,7 +246,6 @@ namespace MzidToTsvConverter
         private void ShowWarning(string warningMessage)
         {
             ConsoleMsgUtils.ShowWarning(warningMessage);
-
         }
     }
 }

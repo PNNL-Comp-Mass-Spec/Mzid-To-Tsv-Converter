@@ -11,7 +11,7 @@ namespace MzidToTsvConverter
             var options = new ConverterOptions();
             var asmName = typeof(Program).GetTypeInfo().Assembly.GetName();
             var programVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
-            var version = string.Format("version {0}.{1}.{2}", programVersion.Major, programVersion.Minor, programVersion.Build);
+            var version = $"version {programVersion.Major}.{programVersion.Minor}.{programVersion.Build}";
             if (!CommandLineParser<ConverterOptions>.ParseArgs(args, options, asmName.Name, version) || !options.ValidateArgs())
             {
                 System.Threading.Thread.Sleep(1500);
