@@ -14,7 +14,7 @@ namespace MzidToTsvConverter
             if (options.HasWildcard(options.MzidPath))
             {
                 // Find matching files
-                var mzidFiles = clsPathUtils.FindFilesWildcard(options.MzidPath);
+                var mzidFiles = PathUtils.FindFilesWildcard(options.MzidPath);
 
                 if (mzidFiles.Count == 0)
                 {

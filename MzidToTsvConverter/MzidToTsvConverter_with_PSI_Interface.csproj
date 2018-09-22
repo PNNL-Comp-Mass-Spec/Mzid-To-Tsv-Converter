@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PRISM-Library" Version="2.4.37" />
+    <PackageReference Include="PRISM-Library" Version="2.4.93" />
   </ItemGroup>
 
   <ItemGroup>
