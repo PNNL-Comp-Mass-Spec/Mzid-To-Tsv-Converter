@@ -43,8 +43,8 @@ namespace MzidToTsvConverter
             {
                 if (options.MzidPaths.Count == 0)
                 {
-                    var subdirsMessage = options.RecurseDirectories ? " or subdirectories" : "";
-                    ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subdirsMessage}.");
+                    var subDirsMessage = options.RecurseDirectories ? " or subdirectories" : "";
+                    ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subDirsMessage}.");
                     return;
                 }
 
@@ -164,7 +164,7 @@ namespace MzidToTsvConverter
                         var qValue = id.QValue;
                         var pepQValue = id.PepQValue;
 
-                        var dedup = new HashSet<string>();
+                        var deDup = new HashSet<string>();
 
                         foreach (var pepEv in id.PepEvidence)
                         {
@@ -183,7 +183,7 @@ namespace MzidToTsvConverter
                             }
 
                             var protein = pepEv.DbSeq.Accession;
-                            if (!dedup.Add(peptideWithModsAndContext + protein))
+                            if (!deDup.Add(peptideWithModsAndContext + protein))
                             {
                                 continue;
                             }
@@ -231,7 +231,7 @@ namespace MzidToTsvConverter
                     }
                 }
             }
-            catch (SimpleMZIdentMLReader.DuplicateKeyException e)
+            catch (SimpleMZIdentMLReader.DuplicateKeyException ex)
             {
                 Console.WriteLine("MZID PARSE ERROR: {0}", e.Message);
                 Console.WriteLine("This type of error is usually caused by an error in the MZID output.");
