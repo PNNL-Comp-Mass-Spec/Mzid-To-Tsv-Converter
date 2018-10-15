@@ -35,7 +35,7 @@ namespace MzidToTsvConverter
         [Option("skipDupIds", HelpText = "If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.", HelpShowsDefault = true)]
         public bool SkipDuplicateIds { get; set; }
 
-        [Option("r", "recurse", HelpText = "If mzid path is a directory, specifying this will cause mzids in subdirectories to also be converted.")]
+        [Option("r", "recurse", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
         public bool RecurseDirectories { get; set; }
 
         public bool IsDirectory { get; private set; }

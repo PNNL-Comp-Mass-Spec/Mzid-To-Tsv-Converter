@@ -227,15 +227,13 @@ namespace MzidToTsvConverter
                     {
                         ShowWarning("Warning: .mzID file does not have any results");
                         System.Threading.Thread.Sleep(1500);
-                        return;
                     }
                 }
             }
             catch (SimpleMZIdentMLReader.DuplicateKeyException ex)
             {
-                Console.WriteLine("MZID PARSE ERROR: {0}", e.Message);
-                Console.WriteLine("This type of error is usually caused by an error in the MZID output.");
-                Console.WriteLine("StackTrace: {1}", e.StackTrace);
+                ConsoleMsgUtils.ShowError(string.Format("MZID PARSE ERROR: {0}", ex.Message), ex);
+                ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
             }
         }
 
