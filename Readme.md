@@ -35,10 +35,12 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 
 Written by Bryson Gibbons and Matthew Monroe for the Department of Energy (PNNL, Richland, WA) \
 E-mail: proteomics@pnnl.gov \
-Website: https://panomics.pnl.gov/ or https://omics.pnl.gov
+Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 
 ## License
 
-The MzidToTsvConverter is licensed under the Apache License, Version 2.0; 
+The MzidToTsvConverter is licensed under the 2-Clause BSD License; 
 you may not use this file except in compliance with the License.  You may obtain 
-a copy of the License at https://opensource.org/licenses/Apache-2.0
+a copy of the License at https://opensource.org/licenses/BSD-2-Clause
+
+Copyright 2018 Battelle Memorial Institute
