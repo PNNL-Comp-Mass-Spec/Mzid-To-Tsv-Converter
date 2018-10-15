@@ -1,5 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net45;net462;netcoreapp2.0</TargetFrameworks>
@@ -17,13 +17,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <Copyright>Copyright @ PNNL 2017</Copyright>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="PRISM-Library" Version="2.4.93" />
+    <PackageReference Include="PRISM-Library" Version="2.5.2" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\PSI_Interface\PSI_Interface\PSI_Interface.csproj" />
   </ItemGroup>
-
 </Project>
