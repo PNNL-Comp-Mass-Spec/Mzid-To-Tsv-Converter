@@ -18,7 +18,7 @@
     <Copyright>Copyright @ PNNL 2017</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="PRISM-Library" Version="2.5.4" />
-    <PackageReference Include="PSI_Interface" Version="1.3.25" />
+    <PackageReference Include="PRISM-Library" Version="2.5.8" />
+    <PackageReference Include="PSI_Interface" Version="1.3.26" />
   </ItemGroup>
 </Project>
