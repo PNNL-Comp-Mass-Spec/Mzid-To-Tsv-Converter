@@ -6,7 +6,7 @@
     <RootNamespace>MzidToTsvConverter</RootNamespace>
     <AssemblyName>MzidToTsvConverter</AssemblyName>
     <PackageId>MzidToTsvConverter</PackageId>
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <Description>Converts mzid[.gz] files to the MS-GF+ tsv format. Designed for MS-GF+ mzid files (looks for EValue and SpecEValue scores)</Description>
@@ -15,7 +15,7 @@
     <Authors>PNNL-Comp-Mass-Spec</Authors>
     <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Mzid-To-Tsv-Converter</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Copyright>Copyright @ PNNL 2017</Copyright>
+    <Copyright>Copyright @ PNNL 2018</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="PRISM-Library" Version="2.5.8" />
