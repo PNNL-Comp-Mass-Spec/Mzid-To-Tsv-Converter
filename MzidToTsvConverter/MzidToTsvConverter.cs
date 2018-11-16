@@ -24,6 +24,7 @@ namespace MzidToTsvConverter
 
                 foreach (var mzidFile in mzidFiles)
                 {
+                    Console.WriteLine();
                     Console.WriteLine("Converting " + mzidFile.FullName);
 
                     string tsvPath;
@@ -36,7 +37,7 @@ namespace MzidToTsvConverter
                         tsvPath = options.TsvPath;
                     }
 
-                    ConvertToTsv(mzidFile.FullName, tsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum, options.SkipDuplicateIds);
+                    ConvertToTsv(mzidFile.FullName, tsvPath, options);
                 }
             }
             else if (options.IsDirectory)
@@ -51,18 +52,25 @@ namespace MzidToTsvConverter
                 foreach (var mzidFile in options.MzidPaths)
                 {
                     var tsvPath = options.AutoNameTsvFromMzid(mzidFile);
-                    ConvertToTsv(mzidFile, tsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum, options.SkipDuplicateIds);
+                    ConvertToTsv(mzidFile, tsvPath, options);
                 }
             }
             else
             {
-                ConvertToTsv(options.MzidPath, options.TsvPath, options.ShowDecoy, options.UnrollResults, options.SingleResultPerSpectrum, options.SkipDuplicateIds);
+                ConvertToTsv(options.MzidPath, options.TsvPath, options);
             }
         }
 
-        public void ConvertToTsv(string mzidPath, string tsvPath, bool showDecoy = true, bool unrollResults = true, bool singleResult = false, bool skipDuplicateIds = false)
+        public void ConvertToTsv(
+            string mzidPath,
+            string tsvPath,
+            ConverterOptions options)
         {
-            var reader = new SimpleMZIdentMLReader(skipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
+            var filterOnSpecEValue = options.FilterEnabled(options.MaxSpecEValue);
+            var filterOnEValue = options.MaxEValue > 0;
+            var filterOnQValue = options.FilterEnabled(options.MaxQValue);
+
+            var reader = new SimpleMZIdentMLReader(options.SkipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
             try
             {
                 using (var data = reader.ReadLowMem(mzidPath))
@@ -123,17 +131,25 @@ namespace MzidToTsvConverter
                     stream.WriteLine(string.Join("\t", headers));
 
                     var lastScanNum = 0;
-                    var resultsWritten = 0;
+                    var firstResultWritten = false;
+
                     var writtenCount = 0;
+
+                    // Number of items in data.Identifications
+                    // Incremented during the foreach loop
+                    var unfilteredCount = 0;
+
+                    // Number of identifications that did not pass the score filters
+                    var filteredOutCount = 0;
 
                     foreach (var id in data.Identifications)
                     {
-                        if (singleResult && id.ScanNum == lastScanNum)
+                        if (options.SingleResultPerSpectrum && id.ScanNum == lastScanNum)
                         {
                             continue;
                         }
 
-                        writtenCount++;
+                        unfilteredCount++;
 
                         lastScanNum = id.ScanNum;
                         var specFile = data.SpectrumFile;
@@ -153,7 +169,6 @@ namespace MzidToTsvConverter
                         }
 
                         var adjExpMz = id.ExperimentalMz - IsotopeMass * int.Parse(isotopeError) / id.Charge;
-                        //var precursorError = (id.CalMz - id.ExperimentalMz) / id.CalMz * 1e6;
                         var precursorError = (adjExpMz - id.CalMz) / id.CalMz * 1e6;
 
                         var charge = id.Charge;
@@ -164,16 +179,37 @@ namespace MzidToTsvConverter
                         var qValue = id.QValue;
                         var pepQValue = id.PepQValue;
 
+                        if (filterOnSpecEValue && specEValue > options.MaxSpecEValue)
+                        {
+                            filteredOutCount++;
+                            continue;
+                        }
+
+                        if (filterOnEValue && eValue > options.MaxEValue)
+                        {
+                            filteredOutCount++;
+                            continue;
+                        }
+
+                        if (filterOnQValue && qValue > options.MaxQValue)
+                        {
+                            filteredOutCount++;
+                            continue;
+                        }
+
                         var uniquePepProteinList = new HashSet<string>();
+
+                        var resultWritten = false;
 
                         foreach (var pepEv in id.PepEvidence)
                         {
-                            if (!showDecoy && pepEv.IsDecoy)
+                            if (!options.ShowDecoy && pepEv.IsDecoy)
                             {
                                 continue;
                             }
 
                             var peptideWithModsAndContext = pepEv.SequenceWithNumericMods;
+
                             // Produce correct output with bad MS-GF+ mzid
                             if (isBadMsGfMzid)
                             {
@@ -196,17 +232,19 @@ namespace MzidToTsvConverter
                             var qValueString = StringUtilities.DblToString(qValue, 5, 0.00005);
                             var pepQValueString = StringUtilities.DblToString(pepQValue, 5, 0.00005);
 
-                            if (resultsWritten == 0)
+                            if (!firstResultWritten)
                             {
                                 // Assure that the first row has 0.0 for score fields (helps in loading data into Access or SQL server)
                                 if (specEValueString == "0") specEValueString = "0.0";
                                 if (eValueString == "0") eValueString = "0.0";
                                 if (qValueString == "0") qValueString = "0.0";
                                 if (pepQValueString == "0") pepQValueString = "0.0";
+
+                                firstResultWritten = true;
                             }
 
                             var line = string.Format(CultureInfo.InvariantCulture,
-                                "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14:0.0####}\t{15:0.0####}",
+                                "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
                                 specFile, specId, scanNum, fragMethod,
                                 precursor, isotopeError, precursorError, charge,
                                 peptideWithModsAndContext, protein,
@@ -214,20 +252,35 @@ namespace MzidToTsvConverter
 
                             stream.WriteLine(line);
 
-                            resultsWritten += 1;
+                            resultWritten = true;
 
-
-                            if (!unrollResults)
+                            if (!options.UnrollResults)
                             {
                                 break;
                             }
                         }
+
+                        if (resultWritten)
+                            writtenCount++;
                     }
 
-                    if (writtenCount == 0)
+                    if (unfilteredCount == 0)
                     {
                         ShowWarning("Warning: .mzID file does not have any results");
                         System.Threading.Thread.Sleep(1500);
+                    }
+                    else if (writtenCount == 0)
+                    {
+                        ShowWarning("Warning: none of the results passed the specified filter(s)");
+                        System.Threading.Thread.Sleep(1500);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Wrote {0:N0} results to {1}", writtenCount, PathUtils.CompactPathString(tsvFile.FullName, 70));
+                        if (filteredOutCount > 0)
+                        {
+                            Console.WriteLine("Filtered out {0:N0} results", filteredOutCount);
+                        }
                     }
                 }
             }

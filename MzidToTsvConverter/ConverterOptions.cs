@@ -15,16 +15,30 @@ namespace MzidToTsvConverter
             ShowDecoy = false;
             SingleResultPerSpectrum = false;
             IsDirectory = false;
+            MaxSpecEValue = 0;
+            MaxEValue = 0;
+            MaxQValue = 0;
         }
 
-        [Option("mzid", Required = true, ArgPosition = 1, HelpText = "Path to mzid[.gz] file; if path has spaces, it must be in quotes. Can also provide a directory.")]
+        [Option("mzid", Required = true, ArgPosition = 1, HelpText = "Path to .mzid or .mzid.gz file; if path has spaces, it must be in quotes. Can also provide a directory to convert all .mzid[.gz] files in the directory.")]
         public string MzidPath { get; set; }
 
         [Option("tsv", ArgPosition = 2, HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid. If mzid path is a directory, this will be treated as a directory path (which must exist).")]
         public string TsvPath { get; set; }
 
-        [Option("unroll", "u", HelpText = "Unroll the results - output one line per unique peptide/protein combination in each spectrum identification", HelpShowsDefault = true)]
+        [Option("unroll", "u",
+            HelpText = "Unroll the results - output one line per unique peptide/protein combination in each spectrum identification",
+            HelpShowsDefault = true)]
         public bool UnrollResults { get; set; }
+
+        [Option("maxSpecEValue", "MaxSpecE", "SpecEValue", HelpText = "Maximum SpecEValue filter (ignored if 0 or 1)", HelpShowsDefault = true, Min = 0, Max = 1)]
+        public double MaxSpecEValue { get; set; }
+
+        [Option("maxEValue", "MaxE", "EValue", HelpText = "Maximum EValue filter (ignored if 0)", HelpShowsDefault = true, Min = 0, Max = float.MaxValue, DefaultValueFormatString = "(Default: {0} Min: {1} Max: {2:0.0E+0})")]
+        public double MaxEValue { get; set; }
+
+        [Option("maxQValue", "MaxQ", "QValue", HelpText = "Maximum QValue filter (ignored if 0 or 1)", HelpShowsDefault = true, Min = 0, Max = 1)]
+        public double MaxQValue { get; set; }
 
         [Option("showDecoy", "sd", HelpText = "Include decoy results in the result tsv", HelpShowsDefault = true)]
         public bool ShowDecoy { get; set; }
@@ -56,6 +70,16 @@ namespace MzidToTsvConverter
             }
 
             return Path.ChangeExtension(path, "tsv");
+        }
+
+        /// <summary>
+        /// Returns true if filterThreshold is greater than 0 but less than 1
+        /// </summary>
+        /// <param name="filterThreshold"></param>
+        /// <returns></returns>
+        public bool FilterEnabled(double filterThreshold)
+        {
+            return filterThreshold > 0 && filterThreshold < 1;
         }
 
         public bool HasWildcard(string filePath)
@@ -152,13 +176,38 @@ namespace MzidToTsvConverter
                 }
             }
 
-            Console.WriteLine("unroll results: {0}", UnrollResults);
-            Console.WriteLine("show decoy: {0}", ShowDecoy);
-            Console.WriteLine("single result per spectrum: {0}", SingleResultPerSpectrum);
+            Console.WriteLine("Unroll results: {0}", UnrollResults);
+            Console.WriteLine("Show decoy: {0}", ShowDecoy);
+            Console.WriteLine("Single result per spectrum: {0}", SingleResultPerSpectrum);
+
             if (SkipDuplicateIds)
             {
-                Console.WriteLine("skipping duplicate IDs");
+                Console.WriteLine("Skipping duplicate IDs");
             }
+
+            if (FilterEnabled(MaxSpecEValue) || MaxEValue > 0 || FilterEnabled(MaxQValue))
+            {
+                Console.WriteLine("Filtering results by score");
+                if (FilterEnabled(MaxSpecEValue))
+                {
+                    Console.WriteLine("Max SpecEValue: {0}", StringUtilities.DblToString(MaxSpecEValue, 5, 0.00005));
+                }
+
+                if (MaxEValue > 0)
+                {
+                    Console.WriteLine("Max EValue: {0}", StringUtilities.DblToString(MaxEValue, 5, 0.00005));
+                }
+
+                if (FilterEnabled(MaxQValue))
+                {
+                    Console.WriteLine("Max QValue: {0}", StringUtilities.DblToString(MaxQValue, 5, 0.00005));
+                }
+            }
+            else
+            {
+                Console.WriteLine("No filters are in use");
+            }
+
         }
 
     }
