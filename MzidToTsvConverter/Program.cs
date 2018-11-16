@@ -26,8 +26,11 @@ namespace MzidToTsvConverter
 #endif
                 var converter = new MzidToTsvConverter();
                 converter.ConvertToTsv(options);
+
+                Console.WriteLine();
                 Console.WriteLine("Conversion finished!");
                 System.Threading.Thread.Sleep(700);
+
                 return 0;
 #if !DEBUG
         }

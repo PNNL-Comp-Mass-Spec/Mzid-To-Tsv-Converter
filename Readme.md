@@ -14,22 +14,33 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 
 ## Syntax
 
-`MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"] [-unroll|-u] [-showDecoy|-sd]`
+`MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"] [-unroll|-u] [-showDecoy|-sd] [-maxSpecEValue] [-maxEValue] [-maxEValue]`
 
 ### Required parameters:
 `-mzid:path` 
 * Path to the .mzid or .mzid.gz file.  If the path has spaces, it must be in quotes.
+* Alternatively, the path to a directory with .mzid or .mzid.gz files.  In this case, all .mzid files in the directory will be converted to .tsv
 
 ### Optional parameters:
 `-tsv:path`
 * Path to the tsv file to be written. If not specified, will be created in the same location as the .mzid file.
 
 `-unroll` or `-u`
-* Signifies that results should be unrolled: one line per unique peptide/protein combination in each spectrum identification
+* Signifies that results should be unrolled, giving one line per unique peptide/protein combination in each spectrum identification
 
 `-showDecoy` or `-sd`
 * Signifies that decoy results should be included in the output .tsv file.
 * Decoy results have protein names that start with XXX_
+
+`-maxSpecEValue` or `-MaxSpecE` or `-SpecEValue`
+* Filter the results, excluding those with a SpecEValue greater than this threshold
+
+`-maxEValue`or `-MaxE` or `-EValue`
+* Filter the results, excluding those with an EValue greater than this threshold
+
+`-maxQValue` or `-MaxQ` or `-QValue`
+* Filter the results, excluding those with a QValue greater than this threshold
+* For example, -qvalue:0.001
 
 ## Output Columns
 
