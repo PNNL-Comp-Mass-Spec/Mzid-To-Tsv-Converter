@@ -70,11 +70,18 @@ namespace MzidToTsvConverter
             var filterOnEValue = options.MaxEValue > 0;
             var filterOnQValue = options.FilterEnabled(options.MaxQValue);
 
+            var tsvFile = new FileInfo(tsvPath);
+            if (tsvFile.Exists)
+            {
+                ShowWarning("Overwriting existing file: " + tsvFile.Name);
+                Console.WriteLine();
+            }
+
             var reader = new SimpleMZIdentMLReader(options.SkipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
             try
             {
                 using (var data = reader.ReadLowMem(mzidPath))
-                using (var stream = new StreamWriter(new FileStream(tsvPath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using (var stream = new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
                 {
                     var headers = new List<string>
                     {
