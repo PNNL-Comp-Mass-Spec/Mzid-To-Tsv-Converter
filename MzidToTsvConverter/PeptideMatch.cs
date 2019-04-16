@@ -29,7 +29,7 @@ namespace MzidToTsvConverter
         }
 
         public double Precursor => Identification.ExperimentalMz;
-        public double IsotopeError => Identification.IsoError;
+        public int IsotopeError => Identification.IsoError;
 
         public double PrecursorErrorPpm
         {
@@ -61,7 +61,7 @@ namespace MzidToTsvConverter
             Map(x => x.ScanNum).Name("ScanNum").Index(index++);
             if (!noExtendedFields)
             {
-                Map(x => x.ScanStartTimeMinutes).Name("ScanTime(Min)").Index(index++);
+                Map(x => x.ScanStartTimeMinutes).Name("ScanTime(Min)").Index(index++).TypeConverterOption.Format("0.0####");
             }
             Map(x => x.FragMethod).Name("FragMethod").Index(index++);
             Map(x => x.Precursor).Name("Precursor").Index(index++).TypeConverterOption.Format("0.0####");

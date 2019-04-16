@@ -17,7 +17,7 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"] [-unroll|-u] [-showDecoy|-sd] [-maxSpecEValue] [-maxEValue] [-maxEValue]`
 
 ### Required parameters:
-`-mzid:path` 
+`-mzid:path`
 * Path to the .mzid or .mzid.gz file.  If the path has spaces, it must be in quotes.
 * Alternatively, the path to a directory with .mzid or .mzid.gz files.  In this case, all .mzid files in the directory will be converted to .tsv
 
@@ -32,6 +32,9 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 * Signifies that decoy results should be included in the output .tsv file.
 * Decoy results have protein names that start with XXX_
 
+`-singleResult` or `-1`
+* Only output one result per spectrum
+
 `-maxSpecEValue` or `-MaxSpecE` or `-SpecEValue`
 * Filter the results, excluding those with a SpecEValue greater than this threshold
 
@@ -42,6 +45,15 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 * Filter the results, excluding those with a QValue greater than this threshold
 * For example, -qvalue:0.001
 
+`-noExtended` or `-ne`
+* Do not output the extended fields (e.g., Scan Time). When this flag is specified the output will have the same columns as the MS-GF+ MzidToTsv output, and be a near match when run with the same parameters
+
+`-recurse` or `-r`
+* If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.
+
+`-skipDupIds`
+* If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.
+
 ## Output Columns
 
 The columns in the .tsv file created by the MzidToTsvConverter are:
@@ -51,6 +63,7 @@ The columns in the .tsv file created by the MzidToTsvConverter are:
 | #SpecFile | Spectrum file name | Dataset.mzML |
 | SpecID | Spectrum ID | controllerType=0 controllerNumber=1 scan=16231 |
 | ScanNum | Scan number | 16231 |
+| ScanTime(Min) | (Can be disable with switch `-ne`) Scan Start time, minutes | 52.534 |
 | FragMethod | Fragmentation method for the given MS/MS spectrum. Will be CID, ETD, or HCD. However, when spectra from the same precursor are merged, fragmentation methods of merged spectra will be shown in the form "FragMethod1/FragMethod2/..." (e.g. CID/ETD, CID/HCD/ETD). | HCD |
 | Precursor | m/z value of the precursor ion | 767.04388 |
 | IsotopeError | Isotope Error, indicating which isotope in the isotopic distribution the parent ion m/z corresponds to.  Typically 0, indicating the first isotope.  If 1, that means the second isotope was chosen for fragmentation. | 0 |
@@ -80,8 +93,8 @@ Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 
 ## License
 
-The MzidToTsvConverter is licensed under the 2-Clause BSD License; 
-you may not use this file except in compliance with the License.  You may obtain 
+The MzidToTsvConverter is licensed under the 2-Clause BSD License;
+you may not use this file except in compliance with the License.  You may obtain
 a copy of the License at https://opensource.org/licenses/BSD-2-Clause
 
 Copyright 2018 Battelle Memorial Institute
