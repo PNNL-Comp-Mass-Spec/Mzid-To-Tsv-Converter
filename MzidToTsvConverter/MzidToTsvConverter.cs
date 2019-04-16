@@ -85,7 +85,7 @@ namespace MzidToTsvConverter
                 {
                     csv.Configuration.AllowComments = false;
                     csv.Configuration.Delimiter = "\t";
-                    csv.Configuration.RegisterClassMap(new PeptideMatchMap());
+                    csv.Configuration.RegisterClassMap(new PeptideMatchMap(options.NoExtendedFields));
 
                     // SPECIAL CASE:
                     // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in

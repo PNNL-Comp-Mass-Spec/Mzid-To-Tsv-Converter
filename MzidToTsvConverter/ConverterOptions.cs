@@ -18,6 +18,7 @@ namespace MzidToTsvConverter
             MaxSpecEValue = 0;
             MaxEValue = 0;
             MaxQValue = 0;
+            NoExtendedFields = false;
         }
 
         [Option("mzid", Required = true, ArgPosition = 1, HelpText = "Path to .mzid or .mzid.gz file; if path has spaces, it must be in quotes. Can also provide a directory to convert all .mzid[.gz] files in the directory.")]
@@ -51,6 +52,9 @@ namespace MzidToTsvConverter
 
         [Option("r", "recurse", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
         public bool RecurseDirectories { get; set; }
+
+        [Option("ne", "noExtended", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
+        public bool NoExtendedFields { get; set; }
 
         public bool IsDirectory { get; private set; }
 

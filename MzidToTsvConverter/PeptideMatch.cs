@@ -14,6 +14,7 @@ namespace MzidToTsvConverter
         public SimpleMZIdentMLReader.SpectrumIdItem Identification { get; set; }
         public string SpecId => Identification.NativeId;
         public int ScanNum => Identification.ScanNum;
+        public double ScanStartTimeMinutes => Identification.ScanTimeMinutes;
 
         public string FragMethod
         {
@@ -52,12 +53,16 @@ namespace MzidToTsvConverter
 
     public class PeptideMatchMap : ClassMap<PeptideMatch>
     {
-        public PeptideMatchMap()
+        public PeptideMatchMap(bool noExtendedFields = false)
         {
             var index = 0;
             Map(x => x.SpecFile).Name("#SpecFile", "SpecFile").Index(index++);
             Map(x => x.SpecId).Name("SpecId").Index(index++);
             Map(x => x.ScanNum).Name("ScanNum").Index(index++);
+            if (!noExtendedFields)
+            {
+                Map(x => x.ScanStartTimeMinutes).Name("ScanTime(Min)").Index(index++);
+            }
             Map(x => x.FragMethod).Name("FragMethod").Index(index++);
             Map(x => x.Precursor).Name("Precursor").Index(index++).TypeConverterOption.Format("0.0####");
             Map(x => x.IsotopeError).Name("IsotopeError").Index(index++);
