@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using CsvHelper;
 using PRISM;
 using PSI_Interface.IdentData;
 
@@ -81,27 +81,11 @@ namespace MzidToTsvConverter
             try
             {
                 using (var data = reader.ReadLowMem(mzidPath))
-                using (var stream = new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using (var csv = new CsvWriter(new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))))
                 {
-                    var headers = new List<string>
-                    {
-                        "#SpecFile",
-                        "SpecID",
-                        "ScanNum",
-                        "FragMethod",
-                        "Precursor",
-                        "IsotopeError",
-                        "PrecursorError(ppm)",
-                        "Charge",
-                        "Peptide",
-                        "Protein",
-                        "DeNovoScore",
-                        "MSGFScore",
-                        "SpecEValue",
-                        "EValue",
-                        "QValue",
-                        "PepQValue"
-                    };
+                    csv.Configuration.AllowComments = false;
+                    csv.Configuration.Delimiter = "\t";
+                    csv.Configuration.RegisterClassMap(new PeptideMatchMap());
 
                     // SPECIAL CASE:
                     // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
@@ -135,10 +119,10 @@ namespace MzidToTsvConverter
                             mzidPath));
                     }
 
-                    stream.WriteLine(string.Join("\t", headers));
+                    csv.WriteHeader<PeptideMatch>();
+                    csv.NextRecord();
 
                     var lastScanNum = 0;
-                    var firstResultWritten = false;
 
                     var writtenCount = 0;
 
@@ -159,46 +143,25 @@ namespace MzidToTsvConverter
                         unfilteredCount++;
 
                         lastScanNum = id.ScanNum;
-                        var specFile = data.SpectrumFile;
-                        var specId = id.NativeId;
-                        var scanNum = id.ScanNum;
-                        var fragMethod = "CID";
-                        if (id.AllParamsDict.ContainsKey("AssumedDissociationMethod"))
+                        var match = new PeptideMatch()
                         {
-                            fragMethod = id.AllParamsDict["AssumedDissociationMethod"];
-                        }
+                            SpecFile = data.SpectrumFile,
+                            Identification = id,
+                        };
 
-                        var precursor = id.ExperimentalMz;
-                        var isotopeError = "0";
-                        if (id.AllParamsDict.ContainsKey("IsotopeError"))
-                        {
-                            isotopeError = id.AllParamsDict["IsotopeError"];
-                        }
-
-                        var adjExpMz = id.ExperimentalMz - IsotopeMass * int.Parse(isotopeError) / id.Charge;
-                        var precursorError = (adjExpMz - id.CalMz) / id.CalMz * 1e6;
-
-                        var charge = id.Charge;
-                        var deNovoScore = id.DeNovoScore;
-                        var msgfScore = id.RawScore;
-                        var specEValue = id.SpecEv;
-                        var eValue = id.EValue;
-                        var qValue = id.QValue;
-                        var pepQValue = id.PepQValue;
-
-                        if (filterOnSpecEValue && specEValue > options.MaxSpecEValue)
+                        if (filterOnSpecEValue && match.SpecEValue > options.MaxSpecEValue)
                         {
                             filteredOutCount++;
                             continue;
                         }
 
-                        if (filterOnEValue && eValue > options.MaxEValue)
+                        if (filterOnEValue && match.EValue > options.MaxEValue)
                         {
                             filteredOutCount++;
                             continue;
                         }
 
-                        if (filterOnQValue && qValue > options.MaxQValue)
+                        if (filterOnQValue && match.QValue > options.MaxQValue)
                         {
                             filteredOutCount++;
                             continue;
@@ -215,49 +178,24 @@ namespace MzidToTsvConverter
                                 continue;
                             }
 
-                            var peptideWithModsAndContext = pepEv.SequenceWithNumericMods;
+                            match.Peptide = pepEv.SequenceWithNumericMods;
 
                             // Produce correct output with bad MS-GF+ mzid
                             if (isBadMsGfMzid)
                             {
                                 // Add the prefix and suffix residues for this protein
                                 // Do not use pepEv.SequenceWithNumericMods; it isn't necessarily correct for this spectrum
-                                peptideWithModsAndContext = pepEv.Pre + "." + id.Peptide.SequenceWithNumericMods + "." + pepEv.Post;
+                                match.Peptide = pepEv.Pre + "." + id.Peptide.SequenceWithNumericMods + "." + pepEv.Post;
                             }
 
-                            var protein = pepEv.DbSeq.Accession;
-                            if (!uniquePepProteinList.Add(peptideWithModsAndContext + protein))
+                            match.Protein = pepEv.DbSeq.Accession;
+                            if (!uniquePepProteinList.Add(match.Peptide + match.Protein))
                             {
                                 continue;
                             }
 
-                            // Write out EValues to 5 sig figs, using scientific notation below 0.0001
-                            var specEValueString = StringUtilities.ValueToString(specEValue, 5, 1000);
-                            var eValueString = StringUtilities.ValueToString(eValue, 5, 1000);
-
-                            // Write out QValue using 5 digits after the decimal, though use scientific notation below 0.00005
-                            var qValueString = StringUtilities.DblToString(qValue, 5, 0.00005);
-                            var pepQValueString = StringUtilities.DblToString(pepQValue, 5, 0.00005);
-
-                            if (!firstResultWritten)
-                            {
-                                // Assure that the first row has 0.0 for score fields (helps in loading data into Access or SQL server)
-                                if (specEValueString == "0") specEValueString = "0.0";
-                                if (eValueString == "0") eValueString = "0.0";
-                                if (qValueString == "0") qValueString = "0.0";
-                                if (pepQValueString == "0") pepQValueString = "0.0";
-
-                                firstResultWritten = true;
-                            }
-
-                            var line = string.Format(CultureInfo.InvariantCulture,
-                                "{0}\t{1}\t{2}\t{3}\t{4:0.0####}\t{5}\t{6:0.0###}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t{15}",
-                                specFile, specId, scanNum, fragMethod,
-                                precursor, isotopeError, precursorError, charge,
-                                peptideWithModsAndContext, protein,
-                                deNovoScore, msgfScore, specEValueString, eValueString, qValueString, pepQValueString);
-
-                            stream.WriteLine(line);
+                            csv.WriteRecord(match);
+                            csv.NextRecord();
 
                             resultWritten = true;
 
@@ -297,10 +235,6 @@ namespace MzidToTsvConverter
                 ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
             }
         }
-
-        public const double C = 12.0f;
-        public const double C13 = 13.00335483;
-        public const double IsotopeMass = C13 - C;
 
         private void ShowWarning(string warningMessage)
         {
