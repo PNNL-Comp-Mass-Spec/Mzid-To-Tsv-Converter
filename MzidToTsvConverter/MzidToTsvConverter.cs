@@ -231,8 +231,8 @@ namespace MzidToTsvConverter
             }
             catch (SimpleMZIdentMLReader.DuplicateKeyException ex)
             {
-                ConsoleMsgUtils.ShowError(string.Format("MZID PARSE ERROR: {0}", ex.Message), ex);
-                ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
+                ConsoleMsgUtils.ShowError("MZID PARSE ERROR", ex);
+                ShowWarning("This type of error is usually caused by an error in the MZID output.");
             }
         }
 
