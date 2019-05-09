@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
+using System.Threading;
 using PRISM;
 
 namespace MzidToTsvConverter
@@ -8,13 +10,46 @@ namespace MzidToTsvConverter
     {
         static int Main(string[] args)
         {
-            var options = new ConverterOptions();
             var asmName = typeof(Program).GetTypeInfo().Assembly.GetName();
+            var exeName = Path.GetFileName(Assembly.GetExecutingAssembly().Location);       // Alternatively: System.AppDomain.CurrentDomain.FriendlyName
             var programVersion = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
             var version = $"version {programVersion.Major}.{programVersion.Minor}.{programVersion.Build}";
-            if (!CommandLineParser<ConverterOptions>.ParseArgs(args, options, asmName.Name, version) || !options.ValidateArgs())
+
+            var parser = new CommandLineParser<ConverterOptions>(asmName.Name, version)
             {
-                System.Threading.Thread.Sleep(1500);
+                ProgramInfo = "This program converts a .mzid file created by MS-GF+ to a tab-delimited text file.",
+
+                ContactInfo = "Program written by Bryson Gibbons for the Department of Energy" + Environment.NewLine +
+                              "(PNNL, Richland, WA) in 2018" +
+                              Environment.NewLine + Environment.NewLine +
+                              "E-mail: bryson.gibbons@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
+                              "Website: https://panomics.pnnl.gov/ or https://omics.pnl.gov",
+
+                UsageExamples = {
+                    exeName + @" Results.mzid",
+                    exeName + @" Results.mzid -unroll",
+                    exeName + @" Results.mzid -unroll -showDecoy",
+                }
+            };
+
+            var parseResults = parser.ParseArgs(args);
+            var options = parseResults.ParsedResults;
+
+            if (!parseResults.Success)
+            {
+                Thread.Sleep(1500);
+                return -1;
+            }
+
+            if (!options.ValidateArgs(out var errorMessage))
+            {
+                parser.PrintHelp();
+
+                Console.WriteLine();
+                ConsoleMsgUtils.ShowWarning("Validation error:");
+                ConsoleMsgUtils.ShowWarning(errorMessage);
+
+                Thread.Sleep(1500);
                 return -1;
             }
 

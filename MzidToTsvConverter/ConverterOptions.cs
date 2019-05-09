@@ -91,11 +91,11 @@ namespace MzidToTsvConverter
             return filePath.Contains("*") || filePath.Contains("?");
         }
 
-        public bool ValidateArgs()
+        public bool ValidateArgs(out string errorMessage)
         {
             if (string.IsNullOrWhiteSpace(MzidPath))
             {
-                Console.WriteLine("ERROR: mzid path must be specified!");
+                errorMessage = "ERROR: mzid path must be specified!";
                 return false;
             }
 
@@ -110,8 +110,7 @@ namespace MzidToTsvConverter
                     }
                     else
                     {
-                        Console.WriteLine("ERROR: mzid file does not exist!");
-                        Console.WriteLine(mzidFile.FullName);
+                        errorMessage = "ERROR: mzid file does not exist: " + mzidFile.FullName;
                         return false;
                     }
                 }
@@ -144,8 +143,8 @@ namespace MzidToTsvConverter
             {
                 if (!string.IsNullOrWhiteSpace(TsvPath) && !Directory.Exists(TsvPath))
                 {
-                    Console.WriteLine("ERROR: mzid path is a directory, but tsv path is not an existing directory!");
-                    Console.WriteLine("Correct the tsv path or create directory \"{0}\"!", TsvPath);
+                    errorMessage = "ERROR: mzid path is a directory, but tsv path is not an existing directory! " +
+                                   "Correct the tsv path or create directory " + TsvPath;
                     return false;
                 }
             }
@@ -154,6 +153,7 @@ namespace MzidToTsvConverter
                 TsvPath = AutoNameTsvFromMzid(MzidPath);
             }
 
+            errorMessage = string.Empty;
             return true;
         }
 
