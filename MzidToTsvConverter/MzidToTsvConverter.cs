@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using CsvHelper;
 using PRISM;
 using PSI_Interface.IdentData;
@@ -212,12 +213,12 @@ namespace MzidToTsvConverter
                     if (unfilteredCount == 0)
                     {
                         ShowWarning("Warning: .mzID file does not have any results");
-                        System.Threading.Thread.Sleep(1500);
+                        Thread.Sleep(1500);
                     }
                     else if (writtenCount == 0)
                     {
                         ShowWarning("Warning: none of the results passed the specified filter(s)");
-                        System.Threading.Thread.Sleep(1500);
+                        Thread.Sleep(1500);
                     }
                     else
                     {
