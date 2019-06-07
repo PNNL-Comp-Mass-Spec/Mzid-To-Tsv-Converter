@@ -19,7 +19,7 @@ namespace MzidToTsvConverter
 
                 if (mzidFiles.Count == 0)
                 {
-                    ShowWarning("No mzid files were found with path spec " + options.MzidPath);
+                    ConsoleMsgUtils.ShowWarning("No mzid files were found with path spec " + options.MzidPath);
                     return;
                 }
 
@@ -46,7 +46,7 @@ namespace MzidToTsvConverter
                 if (options.MzidPaths.Count == 0)
                 {
                     var subDirsMessage = options.RecurseDirectories ? " or subdirectories" : "";
-                    ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subDirsMessage}.");
+                    ConsoleMsgUtils.ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subDirsMessage}.");
                     return;
                 }
 
@@ -74,7 +74,7 @@ namespace MzidToTsvConverter
             var tsvFile = new FileInfo(tsvPath);
             if (tsvFile.Exists)
             {
-                ShowWarning("Overwriting existing file: " + tsvFile.Name);
+                ConsoleMsgUtils.ShowWarning("Overwriting existing file: " + tsvFile.Name);
                 Console.WriteLine();
             }
 
@@ -114,10 +114,8 @@ namespace MzidToTsvConverter
 
                     if (isBadMsGfMzid)
                     {
-                        ShowWarning(string.Format(
-                            "Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
-                            " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.",
-                            mzidPath));
+                        ConsoleMsgUtils.ShowWarning("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
+                                                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath);
                     }
 
                     csv.WriteHeader<PeptideMatch>();
@@ -212,12 +210,12 @@ namespace MzidToTsvConverter
 
                     if (unfilteredCount == 0)
                     {
-                        ShowWarning("Warning: .mzID file does not have any results");
+                        ConsoleMsgUtils.ShowWarning("Warning: .mzID file does not have any results");
                         Thread.Sleep(1500);
                     }
                     else if (writtenCount == 0)
                     {
-                        ShowWarning("Warning: none of the results passed the specified filter(s)");
+                        ConsoleMsgUtils.ShowWarning("Warning: none of the results passed the specified filter(s)");
                         Thread.Sleep(1500);
                     }
                     else
@@ -233,13 +231,8 @@ namespace MzidToTsvConverter
             catch (SimpleMZIdentMLReader.DuplicateKeyException ex)
             {
                 ConsoleMsgUtils.ShowError("MZID PARSE ERROR", ex);
-                ShowWarning("This type of error is usually caused by an error in the MZID output.");
+                ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
             }
-        }
-
-        private void ShowWarning(string warningMessage)
-        {
-            ConsoleMsgUtils.ShowWarning(warningMessage);
         }
     }
 }

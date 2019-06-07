@@ -20,8 +20,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="9.2.3" />
-    <PackageReference Include="PRISM-Library" Version="2.5.20" />
-    <PackageReference Include="PSI_Interface" Version="1.3.31" />
+    <PackageReference Include="PRISM-Library" Version="2.5.21" />
+    <PackageReference Include="PSI_Interface" Version="2.2.1" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)..\Readme.md&quot; &quot;$(TargetDir)&quot; /y /d" />
