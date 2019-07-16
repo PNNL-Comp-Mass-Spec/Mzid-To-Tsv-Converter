@@ -52,7 +52,7 @@ namespace MzidToTsvConverter
             {
                 if (options.MzidPaths.Count == 0)
                 {
-                    var subDirsMessage = options.RecurseDirectories ? " or subdirectories" : "";
+                    var subDirsMessage = options.RecurseDirectories ? " or subdirectories" : string.Empty;
                     ConsoleMsgUtils.ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subDirsMessage}.");
                     return;
                 }
@@ -81,8 +81,12 @@ namespace MzidToTsvConverter
             var tsvFile = new FileInfo(tsvPath);
             if (tsvFile.Exists)
             {
-                ConsoleMsgUtils.ShowWarning("Overwriting existing file: " + tsvFile.Name);
+                ConsoleMsgUtils.ShowWarning("Overwriting existing file: " + PathUtils.CompactPathString(tsvFile.FullName, 90));
                 Console.WriteLine();
+            }
+            else
+            {
+                ConsoleMsgUtils.ShowWarning("Creating: " + PathUtils.CompactPathString(tsvFile.FullName, 115));
             }
 
             var reader = new SimpleMZIdentMLReader(options.SkipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
