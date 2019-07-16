@@ -19,7 +19,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="9.2.3" />
-    <PackageReference Include="PRISM-Library" Version="2.5.21" />
+    <PackageReference Include="PRISM-Library" Version="2.5.24" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\PSI_Interface\PSI_Interface\PSI_Interface.csproj" />

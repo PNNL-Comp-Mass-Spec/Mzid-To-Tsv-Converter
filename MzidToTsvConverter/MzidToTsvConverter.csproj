@@ -20,7 +20,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="9.2.3" />
-    <PackageReference Include="PRISM-Library" Version="2.5.21" />
+    <PackageReference Include="PRISM-Library" Version="2.5.24" />
     <PackageReference Include="PSI_Interface" Version="2.2.1" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
