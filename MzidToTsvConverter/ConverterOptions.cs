@@ -188,6 +188,7 @@ namespace MzidToTsvConverter
                 {
                     // Processing all .mzid or .mzid.gz files in a directory
 
+                    // Assure that TsvPath points to a directory, and that it exists
                     if (TsvPath.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase) ||
                         TsvPath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
                     {
@@ -196,6 +197,7 @@ namespace MzidToTsvConverter
                     }
 
                     var tsvDirectory = new DirectoryInfo(TsvPath);
+                    AssureDirectoryExists(tsvDirectory);
                 }
                 else
                 {
@@ -205,6 +207,7 @@ namespace MzidToTsvConverter
                         TsvPath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
                     {
                         // TsvPath has a file name (or path to a file)
+                        // Assure that the file's parent directory exists
                         FileInfo tsvFile;
                         if (TsvPath.IndexOf(Path.DirectorySeparatorChar) >= 0 || mzidFileDirectory == null)
                         {
@@ -216,10 +219,13 @@ namespace MzidToTsvConverter
                             TsvPath = tsvFile.FullName;
                         }
 
+                        AssureDirectoryExists(tsvFile.Directory);
                     }
                     else
                     {
+                        // Assure that the directory exists and auto-define the name
                         var tsvDirectory = new DirectoryInfo(TsvPath);
+                        AssureDirectoryExists(tsvDirectory);
                         if (HasWildcard(MzidPath))
                         {
                             TsvPath = tsvDirectory.FullName;
@@ -237,6 +243,15 @@ namespace MzidToTsvConverter
             return true;
         }
 
+        private void AssureDirectoryExists(DirectoryInfo directoryInfo)
+        {
+            if (directoryInfo == null || directoryInfo.Exists)
+                return;
+
+            ConsoleMsgUtils.ShowWarning("Creating missing directory: " + directoryInfo.FullName);
+            directoryInfo.Create();
+            Console.WriteLine();
+        }
 
         private string GetParentDirectoryPath(string filePath)
         {
