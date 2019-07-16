@@ -21,24 +21,33 @@ namespace MzidToTsvConverter
             NoExtendedFields = false;
         }
 
-        [Option("mzid", Required = true, ArgPosition = 1, HelpText = "Path to .mzid or .mzid.gz file; if path has spaces, it must be in quotes. Can also provide a directory to convert all .mzid[.gz] files in the directory.")]
+        [Option("mzid", Required = true, ArgPosition = 1,
+            HelpText = "Path to .mzid or .mzid.gz file; if path has spaces, it must be in quotes. " +
+                       "Can also provide a directory to convert all .mzid[.gz] files in the directory.")]
         public string MzidPath { get; set; }
 
         [Option("tsv", ArgPosition = 2, HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid. If mzid path is a directory, this will be treated as a directory path (which must exist).")]
         public string TsvPath { get; set; }
 
         [Option("unroll", "u",
-            HelpText = "Unroll the results - output one line per unique peptide/protein combination in each spectrum identification",
+            HelpText = "Unroll the results: output one line per unique peptide/protein combination in each spectrum identification",
             HelpShowsDefault = true)]
         public bool UnrollResults { get; set; }
 
-        [Option("maxSpecEValue", "MaxSpecE", "SpecEValue", HelpText = "Maximum SpecEValue filter (ignored if 0 or 1)", HelpShowsDefault = true, Min = 0, Max = 1)]
+        [Option("maxSpecEValue", "MaxSpecE", "SpecEValue",
+            HelpText = "Maximum SpecEValue filter (ignored if 0 or 1)",
+            HelpShowsDefault = true, Min = 0, Max = 1)]
         public double MaxSpecEValue { get; set; }
 
-        [Option("maxEValue", "MaxE", "EValue", HelpText = "Maximum EValue filter (ignored if 0)", HelpShowsDefault = true, Min = 0, Max = float.MaxValue, DefaultValueFormatString = "(Default: {0} Min: {1} Max: {2:0.0E+0})")]
+        [Option("maxEValue", "MaxE", "EValue",
+            HelpText = "Maximum EValue filter (ignored if 0)",
+            HelpShowsDefault = true, Min = 0, Max = float.MaxValue,
+            DefaultValueFormatString = "(Default: {0} Min: {1} Max: {2:0.0E+0})")]
         public double MaxEValue { get; set; }
 
-        [Option("maxQValue", "MaxQ", "QValue", HelpText = "Maximum QValue filter (ignored if 0 or 1)", HelpShowsDefault = true, Min = 0, Max = 1)]
+        [Option("maxQValue", "MaxQ", "QValue",
+            HelpText = "Maximum QValue filter (ignored if 0 or 1)",
+            HelpShowsDefault = true, Min = 0, Max = 1)]
         public double MaxQValue { get; set; }
 
         [Option("showDecoy", "sd", HelpText = "Include decoy results in the result tsv", HelpShowsDefault = true)]
@@ -47,7 +56,10 @@ namespace MzidToTsvConverter
         [Option("singleResult", "1", HelpText = "Only output one result per spectrum", HelpShowsDefault = true)]
         public bool SingleResultPerSpectrum { get; set; }
 
-        [Option("skipDupIds", HelpText = "If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.", HelpShowsDefault = true)]
+        [Option("skipDupIds",
+            HelpText = "If there are issues converting a file due to \"duplicate ID\" errors, " +
+                       "specifying this will cause the duplicate IDs to be ignored, " +
+                       "at the likely cost of some correctness.", HelpShowsDefault = true)]
         public bool SkipDuplicateIds { get; set; }
 
         [Option("r", "recurse", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
@@ -56,6 +68,9 @@ namespace MzidToTsvConverter
         [Option("ne", "noExtended", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
         public bool NoExtendedFields { get; set; }
 
+        /// <summary>
+        /// True if we are processing all .mzid or .mzid.gz files in a directory
+        /// </summary>
         public bool IsDirectory { get; private set; }
 
         public List<string> MzidPaths { get; } = new List<string>();
@@ -163,20 +178,20 @@ namespace MzidToTsvConverter
             if (!IsDirectory)
             {
                 Console.WriteLine("mzid path: \"{0}\"", MzidPath);
-                Console.WriteLine("tsv path: \"{0}\"", TsvPath);
+                Console.WriteLine("tsv path:  \"{0}\"", TsvPath);
             }
             else
             {
-                Console.WriteLine("mzid directory: \"{0}\"{1}", MzidPath, RecurseDirectories ? " and subdirectories" : "");
+                Console.WriteLine("mzid directory: \"{0}\"{1}", MzidPath, RecurseDirectories ? " and subdirectories" : string.Empty);
                 if (!string.IsNullOrWhiteSpace(TsvPath))
                 {
-                    Console.WriteLine("tsv directory: \"{0}\"", TsvPath);
+                    Console.WriteLine("tsv directory:  \"{0}\"", TsvPath);
                 }
                 Console.WriteLine("mzid and tsv paths:");
                 foreach (var path in MzidPaths)
                 {
                     Console.WriteLine("\t{0}", path);
-                    Console.WriteLine("\t\t{0}", AutoNameTsvFromMzid(path));
+                    Console.WriteLine("\t  {0}", AutoNameTsvFromMzid(path));
                 }
             }
 
