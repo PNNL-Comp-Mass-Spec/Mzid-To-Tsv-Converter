@@ -26,7 +26,10 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 ### Optional parameters:
 
 `-tsv:path`
-* Path to the tsv file to be written. If not specified, will be created in the same location as the .mzid file.
+* Path to tsv file to be written
+  * Can be a filename, a directory path, or a file path
+* If not specified, will be output to the same location as the mzid.
+* If mzid path is a directory, this will be treated as a directory path
 
 `-unroll` or `-u`
 * Signifies that results should be unrolled, giving one line per unique peptide/protein combination in each spectrum identification
@@ -49,7 +52,8 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 * For example, -qvalue:0.001
 
 `-noExtended` or `-ne`
-* Do not output the extended fields (e.g., Scan Time). When this flag is specified the output will have the same columns as the MS-GF+ MzidToTsv output, and be a near match when run with the same parameters
+* Do not output the extended fields (e.g., Scan Time)
+* When this flag is specified, the output will have the same columns as the MS-GF+ MzidToTsv output, and be a near match when run with the same parameters
 
 `-recurse` or `-r`
 * If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.
