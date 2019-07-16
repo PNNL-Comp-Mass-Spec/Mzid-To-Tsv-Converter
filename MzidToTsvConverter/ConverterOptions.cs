@@ -9,8 +9,8 @@ namespace MzidToTsvConverter
     {
         public ConverterOptions()
         {
-            MzidPath = "";
-            TsvPath = "";
+            MzidPath = string.Empty;
+            TsvPath = string.Empty;
             UnrollResults = false;
             ShowDecoy = false;
             SingleResultPerSpectrum = false;
@@ -26,7 +26,10 @@ namespace MzidToTsvConverter
                        "Can also provide a directory to convert all .mzid[.gz] files in the directory.")]
         public string MzidPath { get; set; }
 
-        [Option("tsv", ArgPosition = 2, HelpText = "Path to tsv file to be written; if not specified, will be output to the same location as the mzid. If mzid path is a directory, this will be treated as a directory path (which must exist).")]
+        [Option("tsv", ArgPosition = 2,
+            HelpText = "Path to tsv file to be written (can be a filename, a directory path, or a file path). " +
+                       "If not specified, will be output to the same location as the mzid. " +
+                       "If mzid path is a directory, this will be treated as a directory path.")]
         public string TsvPath { get; set; }
 
         [Option("unroll", "u",
@@ -114,14 +117,25 @@ namespace MzidToTsvConverter
                 return false;
             }
 
-            if (!HasWildcard(MzidPath))
+            string mzidFileDirectory;
+
+            if (HasWildcard(MzidPath))
+            {
+                mzidFileDirectory = GetParentDirectoryPath(MzidPath);
+            } else
+
             {
                 var mzidFile = new FileInfo(MzidPath);
-                if (!mzidFile.Exists)
+                if (mzidFile.Exists)
+                {
+                    mzidFileDirectory = mzidFile.DirectoryName;
+                }
+                else
                 {
                     if (Directory.Exists(MzidPath))
                     {
                         IsDirectory = true;
+                        mzidFileDirectory = MzidPath;
                     }
                     else
                     {
@@ -154,24 +168,88 @@ namespace MzidToTsvConverter
                 }
             }
 
-            if (IsDirectory)
+            if (string.IsNullOrWhiteSpace(TsvPath))
             {
-                if (!string.IsNullOrWhiteSpace(TsvPath) && !Directory.Exists(TsvPath))
+                if (!IsDirectory)
                 {
-                    errorMessage = "ERROR: mzid path is a directory, but tsv path is not an existing directory! " +
-                                   "Correct the tsv path or create directory " + TsvPath;
-                    return false;
+                    TsvPath = AutoNameTsvFromMzid(MzidPath);
                 }
             }
-            else if (string.IsNullOrWhiteSpace(TsvPath))
+            else
             {
-                TsvPath = AutoNameTsvFromMzid(MzidPath);
+                if (HasWildcard(TsvPath))
+                {
+                    var parentPath = GetParentDirectoryPath(TsvPath);
+                    if (!string.IsNullOrWhiteSpace(parentPath))
+                        TsvPath = parentPath;
+                }
+
+                if (IsDirectory)
+                {
+                    // Processing all .mzid or .mzid.gz files in a directory
+
+                    if (TsvPath.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase) ||
+                        TsvPath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var tsvFile = new FileInfo(TsvPath);
+                        TsvPath = string.IsNullOrWhiteSpace(tsvFile.DirectoryName) ? string.Empty : tsvFile.DirectoryName;
+                    }
+
+                    var tsvDirectory = new DirectoryInfo(TsvPath);
+                }
+                else
+                {
+                    // Processing a single file, or a set of files specified via a wildcard
+
+                    if (TsvPath.EndsWith(".tsv", StringComparison.OrdinalIgnoreCase) ||
+                        TsvPath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // TsvPath has a file name (or path to a file)
+                        FileInfo tsvFile;
+                        if (TsvPath.IndexOf(Path.DirectorySeparatorChar) >= 0 || mzidFileDirectory == null)
+                        {
+                            tsvFile = new FileInfo(TsvPath);
+                        }
+                        else
+                        {
+                            tsvFile = new FileInfo(Path.Combine(mzidFileDirectory, TsvPath));
+                            TsvPath = tsvFile.FullName;
+                        }
+
+                    }
+                    else
+                    {
+                        var tsvDirectory = new DirectoryInfo(TsvPath);
+                        if (HasWildcard(MzidPath))
+                        {
+                            TsvPath = tsvDirectory.FullName;
+                        }
+                        else
+                        {
+                            var tsvFileName = AutoNameTsvFromMzid(Path.GetFileName(MzidPath));
+                            TsvPath = Path.Combine(TsvPath, tsvFileName);
+                        }
+                    }
+                }
             }
 
             errorMessage = string.Empty;
             return true;
         }
 
+
+        private string GetParentDirectoryPath(string filePath)
+        {
+            // Remove all text after the last \ or /
+            var lastDirectorySeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+            if (lastDirectorySeparator > 0)
+            {
+                return filePath.Substring(0, lastDirectorySeparator);
+            }
+
+            return string.Empty;
+
+        }
         public void OutputSetOptions()
         {
             Console.WriteLine("Using options:");

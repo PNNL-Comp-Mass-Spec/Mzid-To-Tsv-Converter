@@ -35,7 +35,14 @@ namespace MzidToTsvConverter
                     }
                     else
                     {
-                        tsvPath = options.TsvPath;
+                        if (Directory.Exists(options.TsvPath))
+                        {
+                            tsvPath = Path.Combine(options.TsvPath, options.AutoNameTsvFromMzid(mzidFile.Name));
+                        }
+                        else
+                        {
+                            tsvPath = options.TsvPath;
+                        }
                     }
 
                     ConvertToTsv(mzidFile.FullName, tsvPath, options);
