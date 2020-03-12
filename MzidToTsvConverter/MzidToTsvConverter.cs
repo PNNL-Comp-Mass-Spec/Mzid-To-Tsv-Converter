@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using CsvHelper;
@@ -93,7 +94,7 @@ namespace MzidToTsvConverter
             try
             {
                 using (var data = reader.ReadLowMem(mzidPath))
-                using (var csv = new CsvWriter(new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))))
+                using (var csv = new CsvWriter(new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.CurrentCulture))
                 {
                     csv.Configuration.AllowComments = false;
                     csv.Configuration.Delimiter = "\t";
