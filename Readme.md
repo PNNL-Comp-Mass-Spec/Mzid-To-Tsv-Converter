@@ -61,6 +61,9 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-skipDupIds`
 * If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.
 
+`-geneid`
+* If specified, adds a 'GeneID' column to the output for non-decoy identification. Can supply a regular expression to extract it from the protein identifier/description. Default expression supports the UniProt SwissProt format.
+
 ## Output Columns
 
 The columns in the .tsv file created by the MzidToTsvConverter are:
@@ -78,6 +81,7 @@ The columns in the .tsv file created by the MzidToTsvConverter are:
 | Charge         | Charge state of the parent ion                                          | 3                     |
 | Peptide        | The identified peptide, with prefix and suffix residues. Also includes a numeric representation of both static and dynamic post translational  modifications.                                                                     | K.VPPAPVPC+57.021PPPS+79.966PGPSAVPSSPK.S |
 | Protein        | Name of the protein this peptide comes from                             | BAG3_HUMAN            |
+| GeneID         | (Enable with switch `-geneid`) Gene ID, parsed from protein description. For this example, a parameter of `-geneid "^([A-Z0-9]{2,})(?=_[A-Z0=9]{2,})"` would be used. | BAG3                  |
 | DeNovoScore    | The MSGFScore of the optimal scoring peptide. Larger scores are better. | 110                   |
 | MSGFScore      | This is MS-GF+'s main scoring value for the identified peptide. Larger scores are better.  | 99 |
 | SpecEValue     | This is MS-GF+'s main scoring value related to peptide confidence (spectrum level e-value) of the peptide-spectrum match. MS-GF+ assumes that the peptide with the lowest SpecEValue value (closest to 0) is correct, and all others are incorrect.                 | 4.23E-21  |
@@ -88,7 +92,7 @@ The columns in the .tsv file created by the MzidToTsvConverter are:
 Notes on QValue and PepQValue
 * QValue is defined as the minimum false discovery rate (FDR) at which the test may be called significant
   * If the value is 0, that means that no reverse hit peptides had a SpecEValue less than or equal to the current peptide's SpecEValue
-* QValue is a spectrum-level FDR and is computed using the formula ReversePeptideCount ÷ ForwardPeptideCount
+* QValue is a spectrum-level FDR and is computed using the formula ReversePeptideCount Ã· ForwardPeptideCount
   * If you filter on QValue < 0.01 you are applying a 1% FDR filter
 * PepQValue is a peptide-level FDR threshold, and will always be lower than QValue
 
