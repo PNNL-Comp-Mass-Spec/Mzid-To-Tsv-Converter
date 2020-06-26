@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using PRISM;
 
 namespace MzidToTsvConverter
 {
     public class ConverterOptions
     {
+        // Default regex: Should support UniProt SwissProt files, and would support others that use the same format
+        // Pattern description: match "sp|[protein ID: 6+ alphanumeric]|[CAPTURE gene ID: 2+ alphanumeric]_[species code: 2+ alphanumeric]"
+        public const string DefaultGeneIdRegexPattern = @"(?<=sp\|[0-9a-zA-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0=9]{2,})";
+
         public ConverterOptions()
         {
             MzidPath = string.Empty;
@@ -19,6 +24,10 @@ namespace MzidToTsvConverter
             MaxEValue = 0;
             MaxQValue = 0;
             NoExtendedFields = false;
+            AddGeneId = false;
+
+            GeneIdRegexPattern = DefaultGeneIdRegexPattern;
+            GeneIdRegex = null;
         }
 
         [Option("mzid", Required = true, ArgPosition = 1,
@@ -71,12 +80,22 @@ namespace MzidToTsvConverter
         [Option("ne", "noExtended", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
         public bool NoExtendedFields { get; set; }
 
+        [Option("geneid",
+            HelpText = "If specified, adds a 'GeneID' column to the output for non-decoy identification. " +
+                       "Can supply a regular expression to extract it from the protein identifier/description. " +
+                       "Default expression supports the UniProt SwissProt format.", ArgExistsProperty = nameof(AddGeneId))]
+        public string GeneIdRegexPattern { get; set; }
+
+        public bool AddGeneId { get; set; }
+
         /// <summary>
         /// True if we are processing all .mzid or .mzid.gz files in a directory
         /// </summary>
         public bool IsDirectory { get; private set; }
 
         public List<string> MzidPaths { get; } = new List<string>();
+
+        public Regex GeneIdRegex { get; private set; }
 
         public string AutoNameTsvFromMzid(string mzidPath)
         {
@@ -117,13 +136,31 @@ namespace MzidToTsvConverter
                 return false;
             }
 
+            if (AddGeneId)
+            {
+                if (string.IsNullOrWhiteSpace(GeneIdRegexPattern))
+                {
+                    GeneIdRegexPattern = DefaultGeneIdRegexPattern;
+                }
+
+                try
+                {
+                    GeneIdRegex = new Regex(GeneIdRegexPattern, RegexOptions.Compiled);
+                }
+                catch
+                {
+                    errorMessage = "ERROR: GeneID Regex is not a valid regular expression.";
+                    return false;
+                }
+            }
+
             string mzidFileDirectory;
 
             if (HasWildcard(MzidPath))
             {
                 mzidFileDirectory = GetParentDirectoryPath(MzidPath);
-            } else
-
+            }
+            else
             {
                 var mzidFile = new FileInfo(MzidPath);
                 if (mzidFile.Exists)
@@ -291,6 +328,11 @@ namespace MzidToTsvConverter
             Console.WriteLine("Unroll results: {0}", UnrollResults);
             Console.WriteLine("Show decoy: {0}", ShowDecoy);
             Console.WriteLine("Single result per spectrum: {0}", SingleResultPerSpectrum);
+
+            if (AddGeneId)
+            {
+                Console.WriteLine("Adding gene IDs to the output using regular expression \"{0}\"", GeneIdRegexPattern);
+            }
 
             if (SkipDuplicateIds)
             {

@@ -98,7 +98,7 @@ namespace MzidToTsvConverter
                 {
                     csv.Configuration.AllowComments = false;
                     csv.Configuration.Delimiter = "\t";
-                    csv.Configuration.RegisterClassMap(new PeptideMatchMap(options.NoExtendedFields));
+                    csv.Configuration.RegisterClassMap(new PeptideMatchMap(options.NoExtendedFields, options.AddGeneId));
 
                     // SPECIAL CASE:
                     // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
@@ -200,6 +200,17 @@ namespace MzidToTsvConverter
                             }
 
                             match.Protein = pepEv.DbSeq.Accession;
+
+                            match.GeneId = "";
+                            if (options.AddGeneId && !pepEv.IsDecoy)
+                            {
+                                var geneMatch = options.GeneIdRegex.Match(pepEv.DbSeq.ProteinDescription);
+                                if (geneMatch.Success && geneMatch.Captures.Count > 0)
+                                {
+                                    match.GeneId = geneMatch.Value;
+                                }
+                            }
+
                             if (!uniquePepProteinList.Add(match.Peptide + match.Protein))
                             {
                                 continue;

@@ -43,6 +43,7 @@ namespace MzidToTsvConverter
         public int Charge => Identification.Charge;
         public string Peptide { get; set; }
         public string Protein { get; set; }
+        public string GeneId { get; set; }
         public int DeNovoScore => Identification.DeNovoScore;
         public double MSGFScore => Identification.RawScore;
         public double SpecEValue => Identification.SpecEv;
@@ -53,7 +54,7 @@ namespace MzidToTsvConverter
 
     public class PeptideMatchMap : ClassMap<PeptideMatch>
     {
-        public PeptideMatchMap(bool noExtendedFields = false)
+        public PeptideMatchMap(bool noExtendedFields = false, bool addGeneId = false)
         {
             var index = 0;
             Map(x => x.SpecFile).Name("#SpecFile", "SpecFile").Index(index++);
@@ -70,6 +71,10 @@ namespace MzidToTsvConverter
             Map(x => x.Charge).Name("Charge").Index(index++);
             Map(x => x.Peptide).Name("Peptide").Index(index++);
             Map(x => x.Protein).Name("Protein").Index(index++);
+            if (addGeneId)
+            {
+                Map(x => x.GeneId).Name("GeneID").Index(index++);
+            }
             Map(x => x.DeNovoScore).Name("DeNovoScore").Index(index++);
             Map(x => x.MSGFScore).Name("MSGFScore").Index(index++);
 
