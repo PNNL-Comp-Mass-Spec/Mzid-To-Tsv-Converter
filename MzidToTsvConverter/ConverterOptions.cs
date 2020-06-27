@@ -86,6 +86,10 @@ namespace MzidToTsvConverter
                        "Default expression supports the UniProt SwissProt format.", ArgExistsProperty = nameof(AddGeneId))]
         public string GeneIdRegexPattern { get; set; }
 
+
+        /// <summary>
+        /// This will be auto-set to true if the user specifies -geneId (or if it's defined in a parameter file)
+        /// </summary>
         public bool AddGeneId { get; set; }
 
         /// <summary>
@@ -95,6 +99,9 @@ namespace MzidToTsvConverter
 
         public List<string> MzidPaths { get; } = new List<string>();
 
+        /// <summary>
+        /// RegEx matcher for extracting gene name from protein name and/or protein description
+        /// </summary>
         public Regex GeneIdRegex { get; private set; }
 
         public string AutoNameTsvFromMzid(string mzidPath)
@@ -149,7 +156,7 @@ namespace MzidToTsvConverter
                 }
                 catch
                 {
-                    errorMessage = "ERROR: GeneID Regex is not a valid regular expression.";
+                    errorMessage = "ERROR: GeneID Regex is not a valid regular expression: " + GeneIdRegexPattern;
                     return false;
                 }
             }

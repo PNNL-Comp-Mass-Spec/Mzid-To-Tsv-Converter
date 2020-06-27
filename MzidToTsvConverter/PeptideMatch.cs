@@ -84,6 +84,8 @@ namespace MzidToTsvConverter
 
             // Write out QValue using 5 digits after the decimal, though use scientific notation below 0.00005
             Map(x => x.QValue).Name("QValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.QValue, 5, 0.00005)));
+
+            // ReSharper disable once RedundantAssignment
             Map(x => x.PepQValue).Name("PepQValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.PepQValue, 5, 0.00005)));
         }
 

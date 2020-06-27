@@ -17,7 +17,7 @@ namespace MzidToTsvConverter
 
             var parser = new CommandLineParser<ConverterOptions>(asmName.Name, version)
             {
-                ProgramInfo = "This program converts a .mzid file created by MS-GF+ to a tab-delimited text file.",
+                ProgramInfo = "This program converts a .mzid file created by MS-GF+ into a tab-delimited text file.",
 
                 ContactInfo = "Program written by Bryson Gibbons for the Department of Energy" + Environment.NewLine +
                               "(PNNL, Richland, WA) in 2018" +
