@@ -61,8 +61,51 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-skipDupIds`
 * If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.
 
-`-geneid`
-* If specified, adds a 'GeneID' column to the output for non-decoy identification. Can supply a regular expression to extract it from the protein identifier/description. Default expression supports the UniProt SwissProt format.
+`-geneId`
+* If specified, adds a 'GeneID' column to the output for non-decoy identifications
+* Optionally supply a regular expression (RegEx) to extract the gene name from the protein identifier and/or the protein description
+* The default expression supports the UniProt SwissProt format, extracting just the gene name and not the species
+  * `-geneId:"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})"`
+  * For example, given `sp|P00760|TRYP_BOVIN`, the extracted gene names is `TRYP`
+
+`-geneIdCS`
+* When specified, use case-sensitive pattern matching when extracting gene names
+
+## Example regular expressions for -geneId
+
+Note that many of these examples use using positive lookbehind to match text before the gene name, but not capture it
+* The default RegEx uses both positive lookbehind and positive lookahead
+
+Match sp proteins, and include organism name in the gene name
+* `-geneId:"(?<=sp\|[0-9A-Z\-]{6,}\|)([A-Z0-9_]{2,})"`
+* Example protein name: `sp|P02438|KR2A_SHEEP`
+* Extracted gene name: `KR2A_SHEEP`
+
+Match sp proteins, but do not include organism name in the gene name 
+* `-geneId:"(?<=sp\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})"`
+* Example protein name: `sp|P02438|KR2A_SHEEP`
+* Extracted gene name: `KR2A`
+
+Match sp or tr proteins and do not include organism name in the gene name
+* `-geneId:"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})"`
+* Example protein name: `tr|E9PNT2|E9PNT2_HUMAN`
+* Extracted gene name: `E9PNT2`
+
+Match gene name in the protein description, as specified by `GN=GeneName`
+* `-geneId:"GN=[^\s|]+"`
+* Example protein name: `GN=PNPLA8`
+* Extracted gene name: `GN=PNPLA8`
+
+Match gene name in the protein description, but do not include `GN=`
+* `-geneId:"(?<=GN=)[^\s|]+"`
+* Example protein name: `GN=PNPLA8`
+* Extracted gene name: `PNPLA8`
+
+The previous RegEx can also match `GN=GeneName` when terms are separated by vertical bars
+* `-geneId:"(?<=GN=)[^\s|]+"`
+* Example protein name: `|GN=KRTAP5-1|chr=11|`
+* Extracted gene name: `KRTAP5-1`
+
 
 ## Output Columns
 
