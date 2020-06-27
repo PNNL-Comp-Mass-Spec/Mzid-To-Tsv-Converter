@@ -201,13 +201,17 @@ namespace MzidToTsvConverter
 
                             match.Protein = pepEv.DbSeq.Accession;
 
-                            match.GeneId = "";
+                            match.GeneId = string.Empty;
                             if (options.AddGeneId && !pepEv.IsDecoy)
                             {
+                                // Note that .ProteinDescription includes both the Protein Name and the Description
                                 var geneMatch = options.GeneIdRegex.Match(pepEv.DbSeq.ProteinDescription);
-                                if (geneMatch.Success && geneMatch.Captures.Count > 0)
+                                if (geneMatch.Success)
                                 {
-                                    match.GeneId = geneMatch.Value;
+                                    if (geneMatch.Captures.Count > 0)
+                                        match.GeneId = geneMatch.Captures[0].Value;
+                                    else
+                                        match.GeneId = geneMatch.Value;
                                 }
                             }
 
