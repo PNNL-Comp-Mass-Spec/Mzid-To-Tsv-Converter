@@ -8,9 +8,14 @@ namespace MzidToTsvConverter
 {
     public class ConverterOptions
     {
-        // Default regex: Should support UniProt SwissProt files, and would support others that use the same format
-        // Pattern description: match "sp|[protein ID: 6+ alphanumeric]|[CAPTURE gene ID: 2+ alphanumeric]_[species code: 2+ alphanumeric]"
-        public const string DefaultGeneIdRegexPattern = @"(?<=sp\|[0-9a-zA-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0=9]{2,})";
+        /// <summary>
+        /// Default RegEx for matching gene names
+        /// Supports the UniProt SwissProt format, extracting just the gene name and not the species
+        /// Pattern description: match "sp|[protein ID: 6+ alphanumeric]|[CAPTURE gene ID: 2+ alphanumeric]_[species code: 2+ alphanumeric]"
+        /// </summary>
+        public const string DefaultGeneIdRegexPattern = @"(?<=((sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})";
+
+        private readonly Regex geneIdRegexTester = new Regex(@"(?<=((sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})");
 
         public ConverterOptions()
         {
