@@ -52,7 +52,7 @@ namespace MzidToTsvConverter
         public double PepQValue => Identification.PepQValue;
     }
 
-    public class PeptideMatchMap : ClassMap<PeptideMatch>
+    public sealed class PeptideMatchMap : ClassMap<PeptideMatch>
     {
         public PeptideMatchMap(bool noExtendedFields = false, bool addGeneId = false)
         {
