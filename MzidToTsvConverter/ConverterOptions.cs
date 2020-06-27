@@ -86,6 +86,9 @@ namespace MzidToTsvConverter
                        "Default expression supports the UniProt SwissProt format.", ArgExistsProperty = nameof(AddGeneId))]
         public string GeneIdRegexPattern { get; set; }
 
+        [Option("geneIdCS", "geneIdCaseSensitive",
+            HelpText = "When this is provided, use case-sensitive RegEx matching when looking for gene name")]
+        public bool GeneIdRegexIsCaseSensitive { get; set; }
 
         /// <summary>
         /// This will be auto-set to true if the user specifies -geneId (or if it's defined in a parameter file)
@@ -152,7 +155,9 @@ namespace MzidToTsvConverter
 
                 try
                 {
-                    GeneIdRegex = new Regex(GeneIdRegexPattern, RegexOptions.Compiled);
+                    GeneIdRegex = new Regex(
+                        GeneIdRegexPattern,
+                        GeneIdRegexIsCaseSensitive ? RegexOptions.Compiled : RegexOptions.Compiled | RegexOptions.IgnoreCase);
                 }
                 catch
                 {
@@ -339,6 +344,14 @@ namespace MzidToTsvConverter
             if (AddGeneId)
             {
                 Console.WriteLine("Adding gene IDs to the output using regular expression \"{0}\"", GeneIdRegexPattern);
+                if (GeneIdRegexIsCaseSensitive)
+                {
+                    Console.WriteLine("  (case sensitive matching)");
+                }
+                else
+                {
+                    Console.WriteLine("  (ignore case when matching)");
+                }
             }
 
             if (SkipDuplicateIds)
