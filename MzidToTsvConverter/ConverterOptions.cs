@@ -80,10 +80,10 @@ namespace MzidToTsvConverter
         [Option("ne", "noExtended", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
         public bool NoExtendedFields { get; set; }
 
-        [Option("geneid",
-            HelpText = "If specified, adds a 'GeneID' column to the output for non-decoy identification. " +
-                       "Can supply a regular expression to extract it from the protein identifier/description. " +
-                       "Default expression supports the UniProt SwissProt format.", ArgExistsProperty = nameof(AddGeneId))]
+        [Option("geneId", "geneName", ArgExistsProperty = nameof(AddGeneId),
+            HelpText = "If specified, adds a 'GeneID' column to the output for non-decoy identifications. " +
+                       "Optionally supply a regular expression to extract it from the protein identifier and/or protein description. " +
+                       "The default expression supports the UniProt SwissProt format.")]
         public string GeneIdRegexPattern { get; set; }
 
         [Option("geneIdCS", "geneIdCaseSensitive",
