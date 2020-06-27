@@ -32,6 +32,8 @@ namespace MzidToTsvConverter
                 }
             };
 
+            parser.AddParamFileKey("Conf");
+
             var parseResults = parser.ParseArgs(args);
             var options = parseResults.ParsedResults;
 
