@@ -208,7 +208,12 @@ namespace MzidToTsvConverter
                                 var geneMatch = options.GeneIdRegex.Match(pepEv.DbSeq.ProteinDescription);
                                 if (geneMatch.Success)
                                 {
-                                    if (geneMatch.Captures.Count > 0)
+                                    // This handles regex with patterns like "GN=([^\s|]+)", returning the capture group instead of the entire match
+                                    // It also handles several other formats; the only issue is if there are any capture groups that are not non-capture groups.
+                                    if (geneMatch.Groups.Count > 1)
+                                        match.GeneId = geneMatch.Groups[geneMatch.Groups.Count - 1].Value;
+                                    // The following handle any captures where there is only one capture group.
+                                    else if (geneMatch.Captures.Count > 0)
                                         match.GeneId = geneMatch.Captures[0].Value;
                                     else
                                         match.GeneId = geneMatch.Value;
