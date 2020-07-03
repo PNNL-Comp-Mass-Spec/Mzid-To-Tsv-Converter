@@ -81,6 +81,15 @@ namespace ConverterUnitTests
         {
             var regex = new Regex(regexPattern);
 
+            var success = MzidToTsvConverter.MzidToTsvConverter.TryGetGeneId(regex, searchString, out var geneId);
+            if (!success)
+            {
+                if (string.IsNullOrEmpty(searchString))
+                    return string.Empty;
+
+                Assert.Fail("RegEx '{0}' did not match '{1}'", regexPattern, searchString);
+            }
+
             var geneMatch = regex.Match(searchString);
 
             var result = "";
@@ -93,6 +102,8 @@ namespace ConverterUnitTests
                 result = geneMatch.Captures[0].Value;
             else
                 result = geneMatch.Value;
+
+            Assert.AreEqual(result, geneId, "geneId returned by TryGetGeneId does not match local code");
 
             for (var i = 0; i < geneMatch.Captures.Count; i++)
             {
