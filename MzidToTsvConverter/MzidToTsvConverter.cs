@@ -12,8 +12,15 @@ namespace MzidToTsvConverter
 {
     public class MzidToTsvConverter
     {
-        public void ConvertToTsv(ConverterOptions options)
+        /// <summary>
+        /// Convert the .mzid file(s) specified by options.MzidPath
+        /// </summary>
+        /// <param name="options">Processing options</param>
+        /// <returns>True if successful for at least one .mzid file, false if an error</returns>
+        public bool ConvertToTsv(ConverterOptions options)
         {
+            var fileCountConverted = 0;
+
             if (options.HasWildcard(options.MzidPath))
             {
                 // Find matching files
@@ -22,7 +29,7 @@ namespace MzidToTsvConverter
                 if (mzidFiles.Count == 0)
                 {
                     ConsoleMsgUtils.ShowWarning("No mzid files were found with path spec " + options.MzidPath);
-                    return;
+                    return false;
                 }
 
                 foreach (var mzidFile in mzidFiles)
@@ -47,31 +54,44 @@ namespace MzidToTsvConverter
                         }
                     }
 
-                    ConvertToTsv(mzidFile.FullName, tsvPath, options);
+                    var success = ConvertToTsv(mzidFile.FullName, tsvPath, options);
+                    if (success)
+                        fileCountConverted++;
                 }
+                return fileCountConverted > 0;
             }
-            else if (options.IsDirectory)
+
+            if (options.IsDirectory)
             {
                 if (options.MzidPaths.Count == 0)
                 {
                     var subDirsMessage = options.RecurseDirectories ? " or subdirectories" : string.Empty;
                     ConsoleMsgUtils.ShowWarning($"No mzid[.gz] files found in directory \"{options.MzidPath}\"{subDirsMessage}.");
-                    return;
+                    return false;
                 }
 
                 foreach (var mzidFile in options.MzidPaths)
                 {
                     var tsvPath = options.AutoNameTsvFromMzid(mzidFile);
-                    ConvertToTsv(mzidFile, tsvPath, options);
+                    var success = ConvertToTsv(mzidFile, tsvPath, options);
+                    if (success)
+                        fileCountConverted++;
                 }
+                return fileCountConverted > 0;
             }
-            else
-            {
-                ConvertToTsv(options.MzidPath, options.TsvPath, options);
-            }
+
+            var successOneFile = ConvertToTsv(options.MzidPath, options.TsvPath, options);
+            return successOneFile;
         }
 
-        public void ConvertToTsv(
+        /// <summary>
+        /// Convert the given .mzid file to a .tsv file
+        /// </summary>
+        /// <param name="mzidPath">.mzid file to read (supports .mzid.gz)</param>
+        /// <param name="tsvPath">.tsv file to create (cannot be an empty string)</param>
+        /// <param name="options">Processing options</param>
+        /// <returns>True if successful, false if an error</returns>
+        public bool ConvertToTsv(
             string mzidPath,
             string tsvPath,
             ConverterOptions options)
@@ -80,7 +100,15 @@ namespace MzidToTsvConverter
             var filterOnEValue = options.MaxEValue > 0;
             var filterOnQValue = options.FilterEnabled(options.MaxQValue);
 
+            if (string.IsNullOrWhiteSpace(tsvPath))
+            {
+                ConsoleMsgUtils.ShowWarning("The target .tsv file path must be defined when calling ConvertToTsv with file paths");
+                Thread.Sleep(1500);
+                return false;
+            }
+
             var tsvFile = new FileInfo(tsvPath);
+
             if (tsvFile.Exists)
             {
                 ConsoleMsgUtils.ShowWarning("Overwriting existing file: " + PathUtils.CompactPathString(tsvFile.FullName, 90));
@@ -235,7 +263,7 @@ namespace MzidToTsvConverter
 
                     if (unfilteredCount == 0)
                     {
-                        ConsoleMsgUtils.ShowWarning("Warning: .mzID file does not have any results");
+                        ConsoleMsgUtils.ShowWarning("Warning: .mzid file does not have any results");
                         Thread.Sleep(1500);
                     }
                     else if (writtenCount == 0)
@@ -252,11 +280,14 @@ namespace MzidToTsvConverter
                         }
                     }
                 }
+
+                return true;
             }
             catch (SimpleMZIdentMLReader.DuplicateKeyException ex)
             {
                 ConsoleMsgUtils.ShowError("MZID PARSE ERROR", ex);
                 ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
+                return false;
             }
         }
 
