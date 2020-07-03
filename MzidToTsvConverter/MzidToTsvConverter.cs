@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using CsvHelper;
 using PRISM;
@@ -205,18 +206,10 @@ namespace MzidToTsvConverter
                             if (options.AddGeneId && !pepEv.IsDecoy)
                             {
                                 // Note that .ProteinDescription includes both the Protein Name and the Description
-                                var geneMatch = options.GeneIdRegex.Match(pepEv.DbSeq.ProteinDescription);
-                                if (geneMatch.Success)
+                                var success = TryGetGeneId(options.GeneIdRegex, pepEv.DbSeq.ProteinDescription, out var geneId);
+                                if (success)
                                 {
-                                    // This handles regex with patterns like "GN=([^\s|]+)", returning the capture group instead of the entire match
-                                    // It also handles several other formats; the only issue is if there are any capture groups that are not non-capture groups.
-                                    if (geneMatch.Groups.Count > 1)
-                                        match.GeneId = geneMatch.Groups[geneMatch.Groups.Count - 1].Value;
-                                    // The following handle any captures where there is only one capture group.
-                                    else if (geneMatch.Captures.Count > 0)
-                                        match.GeneId = geneMatch.Captures[0].Value;
-                                    else
-                                        match.GeneId = geneMatch.Value;
+                                    match.GeneId = geneId;
                                 }
                             }
 
@@ -265,6 +258,34 @@ namespace MzidToTsvConverter
                 ConsoleMsgUtils.ShowError("MZID PARSE ERROR", ex);
                 ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
             }
+        }
+
+        public static bool TryGetGeneId(Regex geneIdRegex, string proteinNameAndDescription, out string geneId)
+        {
+            var geneMatch = geneIdRegex.Match(proteinNameAndDescription);
+            if (!geneMatch.Success)
+            {
+                geneId = string.Empty;
+                return false;
+            }
+
+            // This handles regex with patterns like "GN=([^\s|]+)", returning the capture group instead of the entire match
+            // It also handles several other formats; the only issue is if there are any capture groups that are not non-capture groups.
+            if (geneMatch.Groups.Count > 1)
+            {
+                geneId = geneMatch.Groups[geneMatch.Groups.Count - 1].Value;
+                return true;
+            }
+
+            // If there are captures, use the first one
+            if (geneMatch.Captures.Count > 0)
+            {
+                geneId = geneMatch.Captures[0].Value;
+                return true;
+            }
+
+            geneId = geneMatch.Value;
+            return true;
         }
     }
 }
