@@ -57,10 +57,8 @@ namespace MzidToTsvConverter
 
             options.OutputSetOptions();
 
-#if !DEBUG
             try
             {
-#endif
                 var converter = new MzidToTsvConverter();
                 converter.ConvertToTsv(options);
 
@@ -69,7 +67,6 @@ namespace MzidToTsvConverter
                 Thread.Sleep(700);
 
                 return 0;
-#if !DEBUG
             }
             catch (Exception e)
             {
@@ -82,7 +79,6 @@ namespace MzidToTsvConverter
                     return -1;
                 return errorCode;
             }
-#endif
         }
     }
 }
