@@ -3,58 +3,102 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 
+// ReSharper disable ConvertToConstant.Local
+// ReSharper disable StringLiteralTypo
 namespace ConverterUnitTests
 {
     public class GeneRegexTests
     {
-        // @"GN=([^\s|]+)"
-        // @"(?<=GN=)[^\s|]+"
-        // @"(?<=((sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})"
-        // @"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})"
-        // @"(?<=sp\|[0-9A-Z\-]{6,}\|)([A-Z0-9_]{2,})"
+
+        [TestCase(@"sp|Q9NZD4|AHSP_HUMAN Alpha-hemoglobin-stabilizing protein", "AHSP")]
+        [TestCase(@">sp|Q9Y2K6|UBP20_HUMAN Ubiquitin carboxyl-terminal hydrolase 20 OS=Homo sapiens OX=9606 GN=USP20 PE=1 SV=2", "UBP20")]
+        [TestCase(@"sp|P62266|RS23_HUMAN", "RS23")]
+        [TestCase(@">sp|P62266|RS23_HUMAN", "RS23")]
+        [TestCase(@"sp|P62258|1433E_HUMAN", "1433E")]
+        [TestCase(@"sp|P62258|1433E_XX", "1433E")]
+        [TestCase(@"sp|P62258|1433E_X", "")]
+        [TestCase(@"sp|P62258|1433E_", "")]
+        [TestCase(@"sp|P62258|1433E", "")]
+        [TestCase(@"sp|Q8WXK4", "")]
+        [TestCase(@"sp|Q8WXK4 Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "")]
+        [TestCase(@"sp|Q8WXK4|ASB12_HUMAN Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "ASB12")]
+        public void TestDefaultRegEx(string input, string expected)
+        {
+            var match = GetMatch(MzidToTsvConverter.ConverterOptions.DefaultGeneIdRegexPattern, input, expected);
+            Assert.AreEqual(expected, match);
+        }
+
         [Test]
         [TestCase(@"(?<=sp\|[0-9A-Z\-]{6,}\|)([A-Z0-9_]{2,})", "KR2A_SHEEP")]
         [TestCase(@"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
         [TestCase(@"(?<=((sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
         [TestCase(@"(?<=(?<=(?<=sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
+        [TestCase(@"(?<=(?<=(?<=sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
         public void TestRegex1(string pattern, string expected)
         {
             var input = "sp|P02438|KR2A_SHEEP some other stuff";
-            var match = GetMatch(pattern, input);
+            var match = GetMatch(pattern, input, expected);
             Assert.AreEqual(expected, match);
-
         }
 
         [Test]
         [TestCase(@"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9_]{2,})", "E9PNT2_HUMAN")]
         [TestCase(@"(?<=(sp|tr)\|[0-9A-Z\-]{6,}\|)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "E9PNT2")]
         [TestCase(@"(?<=((sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "E9PNT2")]
+        [TestCase(@"(?<=(?<=(?<=sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "E9PNT2")]
         public void TestRegex2(string pattern, string expected)
         {
             var input = "tr|E9PNT2|E9PNT2_HUMAN some other stuff";
-            var match = GetMatch(pattern, input);
+            var match = GetMatch(pattern, input, expected);
             Assert.AreEqual(expected, match);
         }
 
+        /// <summary>
+        /// These extract text up to the first underscore, but also support preceding text in the UniProt/SwissProt format
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
         [Test]
         [TestCase(@"(?<=((sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
         [TestCase(@"(?<=(?<=(?<=sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
+        [TestCase(@"(?<=(?<=(?<=sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "KR2A")]
         public void TestRegex1Short(string pattern, string expected)
         {
-            var input = "KR2A_SHEEP some other stuff";
-            var match = GetMatch(pattern, input);
-            Assert.AreEqual(expected, match);
+            var input1 = "KR2A_SHEEP some other stuff";
+            var match1 = GetMatch(pattern, input1, expected);
+            Assert.AreEqual(expected, match1);
+
+            Console.WriteLine();
+            var input2 = "sp|P02438|KR2A_SHEEP some other stuff";
+            var match2 = GetMatch(pattern, input2, expected);
+            Assert.AreEqual(expected, match2);
+
         }
 
+        /// <summary>
+        /// These extract text up to the first underscore, but also support preceding text in the UniProt/SwissProt format
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
         [Test]
         [TestCase(@"(?<=((sp|tr)\|[0-9a-zA-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})", "E9PNT2")]
         public void TestRegex2Short(string pattern, string expected)
         {
-            var input = "E9PNT2_HUMAN some other stuff";
-            var match = GetMatch(pattern, input);
-            Assert.AreEqual(expected, match);
+            var input1 = "E9PNT2_HUMAN some other stuff";
+            var match1 = GetMatch(pattern, input1, expected);
+            Assert.AreEqual(expected, match1);
+
+            Console.WriteLine();
+            var input2 = "tr|E9PNT2|E9PNT2_HUMAN some other stuff";
+            var match2 = GetMatch(pattern, input2, expected);
+            Assert.AreEqual(expected, match2);
         }
 
+        /// <summary>
+        /// These demonstrate matching GN=GeneName when that is followed by a space
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
         [Test]
         [TestCase(@"GN=[^\s|]+", "GN=PNPLA8")]
         [TestCase(@"GN=([^\s|]+)", "PNPLA8")]
@@ -62,30 +106,74 @@ namespace ConverterUnitTests
         public void TestRegex3(string pattern, string expected)
         {
             var input = "some stuff GN=PNPLA8 some other stuff";
-            var match = GetMatch(pattern, input);
+            var match = GetMatch(pattern, input, expected);
             Assert.AreEqual(expected, match);
         }
 
+        /// <summary>
+        /// These demonstrate matching GN=GeneName when that is followed by a vertical bar
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
         [Test]
         [TestCase(@"GN=[^\s|]+", "GN=KRTAP5-1")]
         [TestCase(@"GN=([^\s|]+)\|chr", "KRTAP5-1")]
+        [TestCase(@"GN=([^\s]+)\|", "KRTAP5-1|chr=11")]
         [TestCase(@"(?<=GN=)[^\s|]+", "KRTAP5-1")]
         public void TestRegex4(string pattern, string expected)
         {
             var input = "some stuff |GN=KRTAP5-1|chr=11| some other stuff";
-            var match = GetMatch(pattern, input);
+            var match = GetMatch(pattern, input, expected);
             Assert.AreEqual(expected, match);
         }
 
-        private string GetMatch(string regexPattern, string searchString)
+        /// <summary>
+        /// These demonstrate matching gene:GeneName in the protein description
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
+        [Test]
+        [TestCase(@"gene:ENS[^ ]+", "gene:ENSG00000072506")]
+        [TestCase(@"gene:(ENS[^ ]+)", "ENSG00000072506")]
+        [TestCase(@"gene:([^\s|]+)", "ENSG00000072506")]
+        [TestCase(@"(?<=gene:)[^\s|]+", "ENSG00000072506")]
+        public void TestRegex5(string pattern, string expected)
         {
-            var regex = new Regex(regexPattern);
+            var input = "ENSP00000364453 pep:known chromosome:GRCh37:X:53458206:53461303:-1 gene:ENSG00000072506 transcript:ENST00000375304 gene_biotype:protein_coding transcript_biotype:protein_coding";
+            var match = GetMatch(pattern, input, expected);
+            Assert.AreEqual(expected, match);
+        }
+
+        /// <summary>
+        /// These demonstrate how to extract either the entire description after a protein name, or just part of the description
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="expected"></param>
+        [Test]
+        [TestCase(@"[^\s]+ (.+)", "peptide chain release factor 3, PrfC")]
+        [TestCase(@".+, (.+)", "PrfC")]
+        public void TestRegex6(string pattern, string expected)
+        {
+            var input = "SO_1211 peptide chain release factor 3, PrfC";
+            var match = GetMatch(pattern, input, expected);
+            Assert.AreEqual(expected, match);
+        }
+
+        private string GetMatch(string regexPattern, string searchString, string expectedMatch)
+        {
+            var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
 
             var success = MzidToTsvConverter.MzidToTsvConverter.TryGetGeneId(regex, searchString, out var geneId);
             if (!success)
             {
-                if (string.IsNullOrEmpty(searchString))
+                if (string.IsNullOrEmpty(expectedMatch))
+                {
+                    // We expected there to not be a match; that's OK
+                    Console.WriteLine("RegEx \n  {0}\ndid not match \n  {1}\n \nThis was expected",
+                        regexPattern, searchString);
+
                     return string.Empty;
+                }
 
                 Assert.Fail("RegEx '{0}' did not match '{1}'", regexPattern, searchString);
             }
