@@ -20,6 +20,11 @@ namespace MzidToTsvConverter
         /// </remarks>
         public const string DefaultGeneIdRegexPattern = @"(?<=(?<=(?<=sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})";
 
+        /// <summary>
+        /// Program build date
+        /// </summary>
+        public const string PROGRAM_DATE = "2020-07-07";
+
         public ConverterOptions()
         {
             MzidPath = string.Empty;

@@ -19,8 +19,11 @@ namespace MzidToTsvConverter
             {
                 ProgramInfo = "This program converts a .mzid file created by MS-GF+ into a tab-delimited text file.",
 
-                ContactInfo = "Program written by Bryson Gibbons for the Department of Energy" + Environment.NewLine +
-                              "(PNNL, Richland, WA) in 2018" +
+                ContactInfo = "Program written by Bryson Gibbons for the Department of Energy " + Environment.NewLine +
+                              "(PNNL, Richland, WA) in 2018" + Environment.NewLine + Environment.NewLine +
+                              string.Format(
+                                  "Version: {0}.{1}.{2} ({3})",
+                                  programVersion.Major, programVersion.Minor, programVersion.Build, ConverterOptions.PROGRAM_DATE) +
                               Environment.NewLine + Environment.NewLine +
                               "E-mail: bryson.gibbons@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
                               "Website: https://panomics.pnnl.gov/ or https://omics.pnl.gov",
