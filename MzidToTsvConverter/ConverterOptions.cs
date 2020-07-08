@@ -10,9 +10,14 @@ namespace MzidToTsvConverter
     {
         /// <summary>
         /// Default RegEx for matching gene names
-        /// Supports the UniProt SwissProt format, extracting just the gene name and not the species
+        /// Supports the UniProt/SwissProt format, extracting just the gene name and not the species
         /// Pattern description: match "sp|[protein ID: 6+ alphanumeric]|[CAPTURE gene ID: 2+ alphanumeric]_[species code: 2+ alphanumeric]"
         /// </summary>
+        /// <remarks>
+        /// Example 1: the gene name matched for "sp|P02438|KR2A_SHEEP"   is KR2A
+        /// Example 2: the gene name matched for "tr|E9PNT2|E9PNT2_HUMAN" is E9PNT2
+        /// Example 3: the gene name matched for "sp|P62258|1433E_HUMAN"  is 1433E
+        /// </remarks>
         public const string DefaultGeneIdRegexPattern = @"(?<=(?<=(?<=sp|tr)\|[0-9A-Z\-]{6,}\|)|^)([A-Z0-9]{2,})(?=_[A-Z0-9]{2,})";
 
         public ConverterOptions()
