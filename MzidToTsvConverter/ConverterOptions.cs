@@ -89,10 +89,10 @@ namespace MzidToTsvConverter
                        "at the likely cost of some correctness.", HelpShowsDefault = true)]
         public bool SkipDuplicateIds { get; set; }
 
-        [Option("r", "recurse", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
+        [Option("recurse", "r", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
         public bool RecurseDirectories { get; set; }
 
-        [Option("ne", "noExtended", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
+        [Option("noExtended", "ne", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
         public bool NoExtendedFields { get; set; }
 
         [Option("geneId", "geneName", ArgExistsProperty = nameof(AddGeneId),
@@ -101,7 +101,7 @@ namespace MzidToTsvConverter
                        "The default expression supports the UniProt SwissProt format.")]
         public string GeneIdRegexPattern { get; set; }
 
-        [Option("geneIdCS", "geneIdCaseSensitive",
+        [Option("geneIdCaseSensitive", "geneIdCS",
             HelpText = "When this is provided, use case-sensitive RegEx matching when looking for gene name")]
         public bool GeneIdRegexIsCaseSensitive { get; set; }
 
