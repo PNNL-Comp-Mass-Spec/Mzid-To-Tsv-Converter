@@ -8,6 +8,8 @@ namespace MzidToTsvConverter
 {
     public class ConverterOptions
     {
+        // Ignore Spelling: UniProt, SwissProt, sp, tsv, sd, skipDup, ne
+
         /// <summary>
         /// Default RegEx for matching gene names
         /// Supports the UniProt/SwissProt format, extracting just the gene name and not the species
@@ -23,7 +25,7 @@ namespace MzidToTsvConverter
         /// <summary>
         /// Program build date
         /// </summary>
-        public const string PROGRAM_DATE = "2020-07-07";
+        public const string PROGRAM_DATE = "2021-01-08";
 
         public ConverterOptions()
         {

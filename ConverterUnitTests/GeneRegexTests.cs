@@ -9,7 +9,7 @@ namespace ConverterUnitTests
 {
     public class GeneRegexTests
     {
-
+        // Ignore Spelling: sp, Ubiquitin, carboxyl, hydrolase, Ankyrin, UniProt, SwissProt, chr, biotype, PrfC, Foreach
 
         [TestCase("sp|Q9NZD4|AHSP_HUMAN Alpha-hemoglobin-stabilizing protein", "AHSP")]
         [TestCase(">sp|Q9Y2K6|UBP20_HUMAN Ubiquitin carboxyl-terminal hydrolase 20 OS=Homo sapiens OX=9606 GN=USP20 PE=1 SV=2", "UBP20")]

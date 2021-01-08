@@ -8,6 +8,8 @@ namespace MzidToTsvConverter
 {
     public static class Program
     {
+        // Ignore Spelling: Bryson, Conf
+
         private static int Main(string[] args)
         {
             var asmName = typeof(Program).GetTypeInfo().Assembly.GetName();

@@ -6,6 +6,8 @@ namespace MzidToTsvConverter
 {
     public class PeptideMatch
     {
+        // Ignore Spelling: FragMethod, DeNovo
+
         public const double C = 12.0f;
         public const double C13 = 13.00335483;
         public const double IsotopeMass = C13 - C;
@@ -78,7 +80,7 @@ namespace MzidToTsvConverter
             Map(x => x.DeNovoScore).Name("DeNovoScore").Index(index++);
             Map(x => x.MSGFScore).Name("MSGFScore").Index(index++);
 
-            // Write out EValues to 5 sig figs, using scientific notation below 0.0001
+            // Write out EValues to 5 significant figures, using scientific notation below 0.0001
             Map(x => x.SpecEValue).Name("SpecEValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.SpecEValue, 5, 1000)));
             Map(x => x.EValue).Name("EValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.EValue, 5, 1000)));
 
