@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net45;net462;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net462;net472;netcoreapp2.0</TargetFrameworks>
     <RootNamespace>MzidToTsvConverter</RootNamespace>
     <AssemblyName>MzidToTsvConverter</AssemblyName>
     <PackageId>MzidToTsvConverter</PackageId>
@@ -15,10 +15,10 @@
     <Authors>PNNL-Comp-Mass-Spec</Authors>
     <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Mzid-To-Tsv-Converter</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <Copyright>Copyright @ PNNL 2017</Copyright>
+    <Copyright>Copyright @ PNNL 2018</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="9.2.3" />
+    <PackageReference Include="CsvHelper" Version="15.0.5" />
     <PackageReference Include="PRISM-Library" Version="2.6.22" />
   </ItemGroup>
   <ItemGroup>
