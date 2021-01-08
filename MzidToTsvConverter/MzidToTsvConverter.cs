@@ -135,7 +135,8 @@ namespace MzidToTsvConverter
                     // least a 50% chance of the PeptideEvidenceRefs within the SpectrumIdentificationItem being incorrect. So, for
                     // those bad versions, use the peptide_ref rather than the PeptideEvidenceRefs to get the sequence.
                     var isBadMsGfMzid = false;
-                    if (data.AnalysisSoftwareCvAccession.ToUpper().Contains("MS:1002048") && !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
+                    if (data.AnalysisSoftwareCvAccession.IndexOf("MS:1002048", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                        !string.IsNullOrWhiteSpace(data.AnalysisSoftwareVersion))
                     {
                         // bad versions: v10280 (introduced), v10282, v2016.01.20, v2016.01.21, v2016.01.29, v2016.02.12, v2016.05.25, v2016.0.13, v2016.06.13, v2016.06.14, v2016.06.15, v2016.06.29, v2016.07.26, v2016.08.31, v2016.09.07, v2016.09.22, v2016.09.23 (fixed with version v2016.10.10)
                         var badVersions = new[]
@@ -167,7 +168,7 @@ namespace MzidToTsvConverter
                     var writtenCount = 0;
 
                     // Number of items in data.Identifications
-                    // Incremented during the foreach loop
+                    // Incremented during the for each loop
                     var unfilteredCount = 0;
 
                     // Number of identifications that did not pass the score filters
@@ -300,7 +301,7 @@ namespace MzidToTsvConverter
                 return false;
             }
 
-            // This handles regex with patterns like "GN=([^\s|]+)", returning the capture group instead of the entire match
+            // This handles RegEx with patterns like "GN=([^\s|]+)", returning the capture group instead of the entire match
             // It also handles several other formats; the only issue is if there are any capture groups that are not non-capture groups.
             if (geneMatch.Groups.Count > 1)
             {

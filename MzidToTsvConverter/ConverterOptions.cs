@@ -123,7 +123,7 @@ namespace MzidToTsvConverter
         public string AutoNameTsvFromMzid(string mzidPath)
         {
             var path = mzidPath;
-            if (path.ToLower().EndsWith(".gz"))
+            if (path.EndsWith(".gz", StringComparison.OrdinalIgnoreCase))
             {
                 path = Path.ChangeExtension(path, null);
             }
@@ -174,7 +174,7 @@ namespace MzidToTsvConverter
                 }
                 catch
                 {
-                    errorMessage = "ERROR: GeneID Regex is not a valid regular expression: " + GeneIdRegexPattern;
+                    errorMessage = "ERROR: GeneID RegEx is not a valid regular expression: " + GeneIdRegexPattern;
                     return false;
                 }
             }
@@ -325,8 +325,8 @@ namespace MzidToTsvConverter
             }
 
             return string.Empty;
-
         }
+
         public void OutputSetOptions()
         {
             Console.WriteLine("Using options:");
@@ -394,8 +394,6 @@ namespace MzidToTsvConverter
             {
                 Console.WriteLine("No filters are in use");
             }
-
         }
-
     }
 }

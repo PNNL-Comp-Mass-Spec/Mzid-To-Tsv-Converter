@@ -10,18 +10,19 @@ namespace ConverterUnitTests
     public class GeneRegexTests
     {
 
-        [TestCase(@"sp|Q9NZD4|AHSP_HUMAN Alpha-hemoglobin-stabilizing protein", "AHSP")]
-        [TestCase(@">sp|Q9Y2K6|UBP20_HUMAN Ubiquitin carboxyl-terminal hydrolase 20 OS=Homo sapiens OX=9606 GN=USP20 PE=1 SV=2", "UBP20")]
-        [TestCase(@"sp|P62266|RS23_HUMAN", "RS23")]
-        [TestCase(@">sp|P62266|RS23_HUMAN", "RS23")]
-        [TestCase(@"sp|P62258|1433E_HUMAN", "1433E")]
-        [TestCase(@"sp|P62258|1433E_XX", "1433E")]
-        [TestCase(@"sp|P62258|1433E_X", "")]
-        [TestCase(@"sp|P62258|1433E_", "")]
-        [TestCase(@"sp|P62258|1433E", "")]
-        [TestCase(@"sp|Q8WXK4", "")]
-        [TestCase(@"sp|Q8WXK4 Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "")]
-        [TestCase(@"sp|Q8WXK4|ASB12_HUMAN Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "ASB12")]
+
+        [TestCase("sp|Q9NZD4|AHSP_HUMAN Alpha-hemoglobin-stabilizing protein", "AHSP")]
+        [TestCase(">sp|Q9Y2K6|UBP20_HUMAN Ubiquitin carboxyl-terminal hydrolase 20 OS=Homo sapiens OX=9606 GN=USP20 PE=1 SV=2", "UBP20")]
+        [TestCase("sp|P62266|RS23_HUMAN", "RS23")]
+        [TestCase(">sp|P62266|RS23_HUMAN", "RS23")]
+        [TestCase("sp|P62258|1433E_HUMAN", "1433E")]
+        [TestCase("sp|P62258|1433E_XX", "1433E")]
+        [TestCase("sp|P62258|1433E_X", "")]
+        [TestCase("sp|P62258|1433E_", "")]
+        [TestCase("sp|P62258|1433E", "")]
+        [TestCase("sp|Q8WXK4", "")]
+        [TestCase("sp|Q8WXK4 Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "")]
+        [TestCase("sp|Q8WXK4|ASB12_HUMAN Ankyrin repeat and SOCS box protein 12 OS=Homo sapiens OX=9606 GN=ASB12 PE=1 SV=2", "ASB12")]
         public void TestDefaultRegEx(string input, string expected)
         {
             var match = GetMatch(MzidToTsvConverter.ConverterOptions.DefaultGeneIdRegexPattern, input, expected);
@@ -72,7 +73,6 @@ namespace ConverterUnitTests
             var input2 = "sp|P02438|KR2A_SHEEP some other stuff";
             var match2 = GetMatch(pattern, input2, expected);
             Assert.AreEqual(expected, match2);
-
         }
 
         /// <summary>
@@ -133,8 +133,8 @@ namespace ConverterUnitTests
         /// <param name="pattern"></param>
         /// <param name="expected"></param>
         [Test]
-        [TestCase(@"gene:ENS[^ ]+", "gene:ENSG00000072506")]
-        [TestCase(@"gene:(ENS[^ ]+)", "ENSG00000072506")]
+        [TestCase("gene:ENS[^ ]+", "gene:ENSG00000072506")]
+        [TestCase("gene:(ENS[^ ]+)", "ENSG00000072506")]
         [TestCase(@"gene:([^\s|]+)", "ENSG00000072506")]
         [TestCase(@"(?<=gene:)[^\s|]+", "ENSG00000072506")]
         public void TestRegex5(string pattern, string expected)
@@ -151,7 +151,7 @@ namespace ConverterUnitTests
         /// <param name="expected"></param>
         [Test]
         [TestCase(@"[^\s]+ (.+)", "peptide chain release factor 3, PrfC")]
-        [TestCase(@".+, (.+)", "PrfC")]
+        [TestCase(".+, (.+)", "PrfC")]
         public void TestRegex6(string pattern, string expected)
         {
             var input = "SO_1211 peptide chain release factor 3, PrfC";
@@ -278,6 +278,5 @@ namespace ConverterUnitTests
 
             return string.Empty;
         }
-
     }
 }

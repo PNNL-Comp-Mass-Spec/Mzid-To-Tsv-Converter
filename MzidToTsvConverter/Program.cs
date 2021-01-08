@@ -8,7 +8,7 @@ namespace MzidToTsvConverter
 {
     public static class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             var asmName = typeof(Program).GetTypeInfo().Assembly.GetName();
             var exeName = Path.GetFileName(Assembly.GetExecutingAssembly().Location);       // Alternatively: System.AppDomain.CurrentDomain.FriendlyName
@@ -29,9 +29,9 @@ namespace MzidToTsvConverter
                               "Website: https://panomics.pnnl.gov/ or https://omics.pnl.gov",
 
                 UsageExamples = {
-                    exeName + @" Results.mzid",
-                    exeName + @" Results.mzid -unroll",
-                    exeName + @" Results.mzid -unroll -showDecoy",
+                    exeName + " Results.mzid",
+                    exeName + " Results.mzid -unroll",
+                    exeName + " Results.mzid -unroll -showDecoy",
                 }
             };
 
