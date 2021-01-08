@@ -89,19 +89,22 @@ namespace MzidToTsvConverter
                        "at the likely cost of some correctness.", HelpShowsDefault = true)]
         public bool SkipDuplicateIds { get; set; }
 
-        [Option("recurse", "r", HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
+        [Option("recurse", "r", SecondaryArg = true,
+            HelpText = "If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.")]
         public bool RecurseDirectories { get; set; }
 
-        [Option("noExtended", "ne", HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
+        [Option("noExtended", "ne", SecondaryArg = true,
+            HelpText = "If specified, does not add extended fields to the TSV output (e.g., scan time).")]
         public bool NoExtendedFields { get; set; }
 
-        [Option("geneId", "geneName", ArgExistsProperty = nameof(AddGeneId),
+        [Option("geneId", "geneName", SecondaryArg = true,
+            ArgExistsProperty = nameof(AddGeneId),
             HelpText = "If specified, adds a 'GeneID' column to the output for non-decoy identifications. " +
                        "Optionally supply a regular expression to extract it from the protein identifier and/or protein description. " +
                        "The default expression supports the UniProt SwissProt format.")]
         public string GeneIdRegexPattern { get; set; }
 
-        [Option("geneIdCaseSensitive", "geneIdCS",
+        [Option("geneIdCaseSensitive", "geneIdCS", SecondaryArg = true,
             HelpText = "When this is provided, use case-sensitive RegEx matching when looking for gene name")]
         public bool GeneIdRegexIsCaseSensitive { get; set; }
 
@@ -142,7 +145,6 @@ namespace MzidToTsvConverter
         /// Returns true if filterThreshold is greater than 0 but less than 1
         /// </summary>
         /// <param name="filterThreshold"></param>
-        /// <returns></returns>
         public bool FilterEnabled(double filterThreshold)
         {
             return filterThreshold > 0 && filterThreshold < 1;
