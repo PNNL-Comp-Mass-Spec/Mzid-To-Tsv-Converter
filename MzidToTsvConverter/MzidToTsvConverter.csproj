@@ -6,10 +6,10 @@
     <RootNamespace>MzidToTsvConverter</RootNamespace>
     <AssemblyName>MzidToTsvConverter</AssemblyName>
     <PackageId>MzidToTsvConverter</PackageId>
-    <Version>1.4.4</Version>
+    <Version>1.4.5</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
-    <Description>Converts mzid[.gz] files to the MS-GF+ tsv format. Designed for MS-GF+ mzid files (looks for EValue and SpecEValue scores)</Description>
+    <Description>Converts mzid[.gz] files to the MS-GF+ tsv format (tab-separated values). Designed for MS-GF+ mzid files (looks for EValue and SpecEValue scores)</Description>
     <Company>Pacific Northwest National Laboratory</Company>
     <Product>Mzid To Tsv Converter</Product>
     <Authors>PNNL-Comp-Mass-Spec</Authors>
