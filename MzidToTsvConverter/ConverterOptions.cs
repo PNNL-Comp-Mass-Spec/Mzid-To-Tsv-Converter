@@ -108,6 +108,17 @@ namespace MzidToTsvConverter
             HelpText = "When this is provided, use case-sensitive RegEx matching when looking for gene name")]
         public bool GeneIdRegexIsCaseSensitive { get; set; }
 
+        [Option("delimitedProteins", "proteinList", "proteins",
+            HelpText = "For each PSM, include a comma-separated list of proteins in the Protein column " +
+                       "(optionally change the delimiter using proteinNameDelimiter)",
+            HelpShowsDefault = true)]
+        public bool DelimitedProteinNames { get; set; }
+
+        [Option("proteinNameDelimiter", "delim", SecondaryArg = true,
+            HelpText = "Separator to use for the delimited protein names",
+            HelpShowsDefault = true)]
+        public string ProteinNameDelimiter { get; set; }
+
         /// <summary>
         /// This will be auto-set to true if the user specifies -geneId (or if it's defined in a parameter file)
         /// </summary>
@@ -354,9 +365,16 @@ namespace MzidToTsvConverter
                 }
             }
 
-            Console.WriteLine("Unroll results: {0}", UnrollResults);
-            Console.WriteLine("Show decoy: {0}", ShowDecoy);
-            Console.WriteLine("Single result per spectrum: {0}", SingleResultPerSpectrum);
+            Console.WriteLine();
+            Console.WriteLine("{0,-35} {1}", "Unroll results:", UnrollResults);
+            Console.WriteLine("{0,-35} {1}", "Show decoy:", ShowDecoy);
+            Console.WriteLine("{0,-35} {1}", "Single result per spectrum:", SingleResultPerSpectrum);
+            Console.WriteLine("{0,-35} {1}", "Delimited protein name list:", DelimitedProteinNames);
+
+            if (UnrollResults && DelimitedProteinNames)
+            {
+                ConsoleMsgUtils.ShowWarning("Ignoring request to unroll protein names since delimitedProteins is also true");
+            }
 
             if (AddGeneId)
             {
@@ -370,6 +388,8 @@ namespace MzidToTsvConverter
                     Console.WriteLine("  (ignore case when matching)");
                 }
             }
+
+            Console.WriteLine();
 
             if (SkipDuplicateIds)
             {
