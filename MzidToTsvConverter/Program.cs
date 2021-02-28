@@ -73,13 +73,12 @@ namespace MzidToTsvConverter
 
                 return 0;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Console.WriteLine("Conversion failed: " + e.Message);
-                Console.WriteLine(e.StackTrace);
+                ConsoleMsgUtils.ShowError("Conversion failed", ex);
 
                 Thread.Sleep(1500);
-                var errorCode = e.Message.GetHashCode();
+                var errorCode = ex.Message.GetHashCode();
                 if (errorCode == 0)
                     return -1;
                 return errorCode;

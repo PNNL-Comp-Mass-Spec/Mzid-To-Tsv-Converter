@@ -121,6 +121,7 @@ namespace MzidToTsvConverter
                 ConsoleMsgUtils.ShowWarning("Creating: " + PathUtils.CompactPathString(tsvFile.FullName, 115));
             }
 
+            var writtenCount = 0;
 
             if (options.UnrollResults && options.DelimitedProteinNames)
             {
@@ -173,8 +174,6 @@ namespace MzidToTsvConverter
                     csv.NextRecord();
 
                     var lastScanNum = 0;
-
-                    var writtenCount = 0;
 
                     // Number of items in data.Identifications
                     // Incremented during the for each loop
@@ -317,6 +316,12 @@ namespace MzidToTsvConverter
             {
                 ConsoleMsgUtils.ShowError("MZID PARSE ERROR", ex);
                 ConsoleMsgUtils.ShowWarning("This type of error is usually caused by an error in the MZID output.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ConsoleMsgUtils.ShowError(
+                    string.Format("Error converting the file (so far, {0:N0} results have been written", writtenCount), ex);
                 return false;
             }
         }
