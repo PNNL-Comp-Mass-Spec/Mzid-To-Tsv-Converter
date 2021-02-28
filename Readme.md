@@ -2,17 +2,17 @@
 
 ## Overview
 
-Converts an .mzid file created by MS-GF+ to a tab-delimited text file.
+Converts a [mzIdentML](http://www.psidev.info/mzidentml) file (.mzid) created by MS-GF+ to a tab-delimited text file.
 
 Although MS-GF+ has this option (see [MzidToTsv.html](https://msgfplus.github.io/msgfplus/MzidToTsv.html) ),
 MzidToTsvConverter.exe can convert the .mzid file faster, using less memory.
 
 ## Details
 
-MzidToTsvConverter reads in the .mzid file created by MS-GF+ and creates a tsv file with the peptide identifications. 
+MzidToTsvConverter reads in the .mzid file created by MS-GF+ and creates a [tsv file](https://en.wikipedia.org/wiki/Tab-separated_values) with the peptide identifications. 
 The program can also read .mzid.gz files, and it includes other options for how to handle peptides that are associated with multiple proteins.
 
-The MzidToTsvConverter uses [PSI_Interface.dll](https://github.com/PNNL-Comp-Mass-Spec/PSI-Interface) to read the mzid file.
+The MzidToTsvConverter uses [PSI_Interface.dll](https://github.com/PNNL-Comp-Mass-Spec/PSI-Interface) to read the .mzid file.
 
 ## Syntax
 
@@ -34,16 +34,16 @@ MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"]
 ### Optional parameters:
 
 `-tsv:path`
-* Path to tab-separated-value file to be written
+* Path to tab-separated values file to be written
   * Can be a filename, a directory path, or a file path
-* If not specified, will be output to the same location as the mzid.
+* If not specified, will be output to the same location as the mzid
 * If mzid path is a directory, this will be treated as a directory path
 
 `-unroll` or `-u`
 * Signifies that results should be unrolled, giving one line per unique peptide/protein combination in each spectrum identification
 
 `-showDecoy` or `-sd`
-* Signifies that decoy results should be included in the output .tsv file.
+* Signifies that decoy results should be included in the output .tsv file
 * Decoy results have protein names that start with XXX_
 
 `-noExtended` or `-ne`
@@ -64,10 +64,10 @@ MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"]
 * For example, -qvalue:0.001
 
 `-recurse` or `-r`
-* If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.
+* If mzid path is a directory, specifying this will cause .mzid files in subdirectories to also be converted
 
 `-skipDupIds`
-* If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness.
+* If there are issues converting a file due to \"duplicate ID\" errors, specifying this will cause the duplicate IDs to be ignored, at the likely cost of some correctness
 
 `-geneId`
 * If specified, adds a 'GeneID' column to the output for non-decoy identifications
