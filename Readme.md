@@ -9,13 +9,21 @@ MzidToTsvConverter.exe can convert the .mzid file faster, using less memory.
 
 ## Details
 
-MzidToTsvConverter reads in the .mzid created by MS-GF+ and creates a nearly identical tsv file as the MS-GF+ converter -- nearly identical because the number formatting is slightly different.
+MzidToTsvConverter reads in the .mzid file created by MS-GF+ and creates a tsv file with the peptide identifications. 
+The program can also read .mzid.gz files, and it includes other options for how to handle peptides that are associated with multiple proteins.
 
-MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
+The MzidToTsvConverter uses [PSI_Interface.dll](https://github.com/PNNL-Comp-Mass-Spec/PSI-Interface) to read the mzid file.
 
 ## Syntax
 
-`MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"] [-unroll|-u] [-showDecoy|-sd] [-maxSpecEValue] [-maxEValue] [-maxEValue]`
+```
+MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"] 
+  [-unroll] [-showDecoy] [-noExtended] [-singleResult]
+  [-maxSpecEValue] [-maxEValue] [-maxQValue]
+  [-recurse] [-skipDupIds]
+  [-geneId] [-geneIdCS]
+  [-proteinList] [-delim]
+```
 
 ### Required parameters:
 
@@ -26,7 +34,7 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 ### Optional parameters:
 
 `-tsv:path`
-* Path to tsv file to be written
+* Path to tab-separated-value file to be written
   * Can be a filename, a directory path, or a file path
 * If not specified, will be output to the same location as the mzid.
 * If mzid path is a directory, this will be treated as a directory path
@@ -37,6 +45,10 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-showDecoy` or `-sd`
 * Signifies that decoy results should be included in the output .tsv file.
 * Decoy results have protein names that start with XXX_
+
+`-noExtended` or `-ne`
+* Do not output the extended fields (e.g., Scan Time)
+* When this flag is specified, the output will have the same columns as the MS-GF+ MzidToTsv output, and be a near match when run with the same parameters
 
 `-singleResult` or `-1`
 * Only output one result per spectrum
@@ -50,10 +62,6 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-maxQValue` or `-MaxQ` or `-QValue`
 * Filter the results, excluding those with a QValue greater than this threshold
 * For example, -qvalue:0.001
-
-`-noExtended` or `-ne`
-* Do not output the extended fields (e.g., Scan Time)
-* When this flag is specified, the output will have the same columns as the MS-GF+ MzidToTsv output, and be a near match when run with the same parameters
 
 `-recurse` or `-r`
 * If mzid path is a directory, specifying this will cause mzid files in subdirectories to also be converted.
@@ -71,9 +79,16 @@ MzidToTsvConverter uses PSI_Interface.dll to read the mzid file.
 `-geneIdCS`
 * When specified, use case-sensitive pattern matching when extracting gene names
 
+`-proteinList`or `-proteins` or `-delimitedProteins`
+* For each PSM, include a comma-separated list of proteins in the Protein column
+* This setting takes precedence over `-unroll`
+
+`-delim`
+* Separator to use for the delimited protein names (defaults to a comma and space)
+
 ## Example regular expressions for -geneId
 
-Note that many of these examples use using positive lookbehind to match text before the gene name, but not capture it
+Note that many of these examples use positive lookbehind to match text before the gene name, but not capture it
 * The default RegEx uses both positive lookbehind and positive lookahead
 
 Match sp proteins, and include organism name in the gene name
