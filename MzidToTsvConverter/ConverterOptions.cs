@@ -8,7 +8,7 @@ namespace MzidToTsvConverter
 {
     public class ConverterOptions
     {
-        // Ignore Spelling: UniProt, SwissProt, sp, tsv, sd, skipDup, ne
+        // Ignore Spelling: UniProt, SwissProt, sp, tsv, sd, skipDup, ne, delim
 
         /// <summary>
         /// Default RegEx for matching gene names
