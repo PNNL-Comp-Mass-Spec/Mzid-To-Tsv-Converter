@@ -43,6 +43,8 @@ namespace MzidToTsvConverter
 
             GeneIdRegexPattern = DefaultGeneIdRegexPattern;
             GeneIdRegex = null;
+            DelimitedProteinNames = false;
+            ProteinNameDelimiter = ", ";
         }
 
         [Option("mzid", Required = true, ArgPosition = 1,
