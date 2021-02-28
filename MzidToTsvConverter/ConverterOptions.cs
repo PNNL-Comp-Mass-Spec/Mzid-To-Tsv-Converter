@@ -25,7 +25,7 @@ namespace MzidToTsvConverter
         /// <summary>
         /// Program build date
         /// </summary>
-        public const string PROGRAM_DATE = "2021-01-08";
+        public const string PROGRAM_DATE = "2021-02-28";
 
         public ConverterOptions()
         {
@@ -40,7 +40,6 @@ namespace MzidToTsvConverter
             MaxQValue = 0;
             NoExtendedFields = false;
             AddGeneId = false;
-
             GeneIdRegexPattern = DefaultGeneIdRegexPattern;
             GeneIdRegex = null;
             DelimitedProteinNames = false;
@@ -59,7 +58,9 @@ namespace MzidToTsvConverter
         public string TsvPath { get; set; }
 
         [Option("unroll", "u",
-            HelpText = "Unroll the results: output one line per unique peptide/protein combination in each spectrum identification",
+            HelpText = "Unroll the results: when defined, output one line per unique peptide/protein combination in each spectrum identification. " +
+            "Otherwise, output the first protein for each peptide. " +
+            "To obtain all of the proteins as a comma-separated list, use -proteinList at the command line, or define proteinList=True in a parameter file",
             HelpShowsDefault = true)]
         public bool UnrollResults { get; set; }
 
@@ -82,7 +83,7 @@ namespace MzidToTsvConverter
         [Option("showDecoy", "sd", HelpText = "Include decoy results in the result tsv", HelpShowsDefault = true)]
         public bool ShowDecoy { get; set; }
 
-        [Option("singleResult", "1", HelpText = "Only output one result per spectrum", HelpShowsDefault = true)]
+        [Option("singleResult", "1", HelpText = "Only output one result per spectrum (the highest scoring peptide)", HelpShowsDefault = true)]
         public bool SingleResultPerSpectrum { get; set; }
 
         [Option("skipDupIds",

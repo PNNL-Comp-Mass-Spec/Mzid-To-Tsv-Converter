@@ -166,8 +166,10 @@ namespace MzidToTsvConverter
 
                     if (isBadMsGfMzid)
                     {
-                        ConsoleMsgUtils.ShowWarning("Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
-                                                    " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.", mzidPath);
+                        ConsoleMsgUtils.ShowWarning(
+                            "Warning: file \"{0}\" was created with a version of MS-GF+ that had some erroneous output in the mzid file." +
+                            " Using sequences from the peptide_ref attribute instead of the PeptideEvidenceRef element to try to bypass the issue.",
+                            mzidPath);
                     }
 
                     csv.WriteHeader<PeptideMatch>();
