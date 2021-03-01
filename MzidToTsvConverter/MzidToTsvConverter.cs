@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using CsvHelper;
@@ -123,10 +124,12 @@ namespace MzidToTsvConverter
 
             var writtenCount = 0;
 
-            if (options.UnrollResults && options.DelimitedProteinNames)
+            // DelimitedProteinNames takes precedence over UnrollResults
+            // However, behavior below needs to be the same for UnrollResults and DelimitedProteinNames
+            var maxMatchedProteins = 1;
+            if (options.UnrollResults || options.DelimitedProteinNames)
             {
-                // DelimitedProteinNames takes precedence over UnrollResults
-                options.UnrollResults = false;
+                maxMatchedProteins = int.MaxValue;
             }
 
             var reader = new SimpleMZIdentMLReader(options.SkipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
@@ -184,6 +187,9 @@ namespace MzidToTsvConverter
                     // Number of identifications that did not pass the score filters
                     var filteredOutCount = 0;
 
+                    // List of matches in a single result. List is cleared before use.
+                    // Only contains multiple when outputting all protein matches, and a result has multiple protein matches.
+                    var matches = new List<PeptideMatch>(30);
                     foreach (var id in data.Identifications)
                     {
                         if (options.SingleResultPerSpectrum && id.ScanNum == lastScanNum)
@@ -213,60 +219,57 @@ namespace MzidToTsvConverter
                             continue;
                         }
 
+                        // Clear out the list of matches.
+                        matches.Clear();
                         var uniquePepProteinList = new HashSet<string>();
 
                         // id.PepEvidence has one entry for each protein associated with this PSM
-                        var matches = new List<PeptideMatch>();
-
-                        foreach (var pepEv in id.PepEvidence)
+                        IEnumerable<SimpleMZIdentMLReader.PeptideEvidence> pepEvEnum = id.PepEvidence;
+                        if (!options.ShowDecoy)
                         {
-                            if (!options.ShowDecoy && pepEv.IsDecoy)
-                            {
-                                continue;
-                            }
+                            pepEvEnum = pepEvEnum.Where(x => !x.IsDecoy);
+                        }
 
-                            var match = new PeptideMatch
-                            {
-                                SpecFile = data.SpectrumFile,
-                                Identification = id,
-                                Peptide = pepEv.SequenceWithNumericMods,
-                            };
+                        // maxMatchedProteins is '1' or 'int.MaxValue'
+                        foreach (var pepEv in pepEvEnum.Take(maxMatchedProteins))
+                        {
+                            var peptide = pepEv.SequenceWithNumericMods;
 
                             // Produce correct output with bad MS-GF+ mzid
                             if (isBadMsGfMzid)
                             {
                                 // Add the prefix and suffix residues for this protein
                                 // Do not use pepEv.SequenceWithNumericMods; it isn't necessarily correct for this spectrum
-                                match.Peptide = pepEv.Pre + "." + id.Peptide.SequenceWithNumericMods + "." + pepEv.Post;
+                                peptide = pepEv.Pre + "." + id.Peptide.SequenceWithNumericMods + "." + pepEv.Post;
                             }
 
-                            match.Protein = pepEv.DbSeq.Accession;
+                            var protein = pepEv.DbSeq.Accession;
 
-                            match.GeneId = string.Empty;
+                            if (!uniquePepProteinList.Add(peptide + protein))
+                            {
+                                // Don't process the check for the gene ID if it's not a unique match
+                                continue;
+                            }
+
+                            var geneId = string.Empty;
                             if (options.AddGeneId && !pepEv.IsDecoy)
                             {
                                 // Note that .ProteinDescription includes both the Protein Name and the Description
-                                var success = TryGetGeneId(options.GeneIdRegex, pepEv.DbSeq.ProteinDescription, out var geneId);
-                                if (success)
+                                var success = TryGetGeneId(options.GeneIdRegex, pepEv.DbSeq.ProteinDescription, out geneId);
+                                if (!success)
                                 {
-                                    match.GeneId = geneId;
+                                    geneId = string.Empty;
                                 }
                             }
 
-                            if (!uniquePepProteinList.Add(match.Peptide + match.Protein))
+                            matches.Add(new PeptideMatch
                             {
-                                continue;
-                            }
-
-                            matches.Add(match);
-
-                            if (options.DelimitedProteinNames)
-                                continue;
-
-                            if (!options.UnrollResults)
-                            {
-                                break;
-                            }
+                                SpecFile = data.SpectrumFile,
+                                Identification = id,
+                                Peptide = peptide,
+                                Protein = protein,
+                                GeneId = geneId,
+                            });
                         }
 
                         if (matches.Count == 0)
@@ -275,18 +278,14 @@ namespace MzidToTsvConverter
                         if (options.DelimitedProteinNames && matches.Count > 1)
                         {
                             CombineProteinNames(options, matches);
+                            // The first item in matches already lists all of the protein names; remove all remaining matches.
+                            matches.RemoveRange(1, matches.Count - 1);
                         }
 
                         foreach (var item in matches)
                         {
                             csv.WriteRecord(item);
                             csv.NextRecord();
-
-                            if (options.DelimitedProteinNames && matches.Count > 1)
-                            {
-                                // The first item in matches already lists all of the protein names
-                                break;
-                            }
                         }
 
                         writtenCount++;
