@@ -4,7 +4,7 @@
 
 Converts a [mzIdentML](http://www.psidev.info/mzidentml) file (.mzid) created by MS-GF+ to a tab-delimited text file.
 
-Although MS-GF+ has this option (see [MzidToTsv.html](https://msgfplus.github.io/msgfplus/MzidToTsv.html) ),
+Although MS-GF+ has this option (see [MzidToTsv.html](https://msgfplus.github.io/msgfplus/MzidToTsv.html)),
 MzidToTsvConverter.exe can convert the .mzid file faster, using less memory.
 
 ## Details
@@ -61,7 +61,7 @@ MzidToTsvConverter -mzid:"mzid path" [-tsv:"tsv output path"]
 
 `-maxQValue` or `-MaxQ` or `-QValue`
 * Filter the results, excluding those with a QValue greater than this threshold
-* For example, -qvalue:0.001
+* For example, `-qvalue:0.001`
 
 `-recurse` or `-r`
 * If mzid path is a directory, specifying this will cause .mzid files in subdirectories to also be converted
