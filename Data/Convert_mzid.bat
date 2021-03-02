@@ -29,4 +29,23 @@ echo -----------------------------------------------------------------
 %ProgramPath% QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_msgfplus.mzid.gz -proteinList -tsv QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_delimited_msgfplus.tsv
 @echo off
 
+echo.
+echo -----------------------------------------------------------------
+echo Filter by SpecEValue and hide the ScanTime column
+echo -----------------------------------------------------------------
+@echo on
+%ProgramPath% QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_msgfplus.mzid.gz -unroll -maxSpecEValue:1E-11 -ne -tsv QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_filtered_msgfplus.tsv
+@echo off
+
+echo.
+echo -----------------------------------------------------------------
+echo Filter by EValue and extract the gene name
+echo This example uses a regular expression that matches one of two patterns:
+echo - Protein names that start with "Contaminant", continuing until the first space: ^^Contaminant[^^ ]+
+echo - Text up to, but not including the first underscore: ^^[^^_]+
+echo -----------------------------------------------------------------
+@echo on
+%ProgramPath% QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_msgfplus.mzid.gz -unroll -maxEValue:1E-11 -geneId:"(^Contaminant[^ ]+|^[^_]+)" -tsv QC_Mam_19_01_1a_25Feb21_Rage_Rep-21-01-02_AddGene_msgfplus.tsv
+@echo off
+
 pause
