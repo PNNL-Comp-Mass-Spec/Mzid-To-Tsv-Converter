@@ -278,6 +278,7 @@ namespace MzidToTsvConverter
                         if (options.DelimitedProteinNames && matches.Count > 1)
                         {
                             CombineProteinNames(options, matches);
+
                             // The first item in matches already lists all of the protein names; remove all remaining matches.
                             matches.RemoveRange(1, matches.Count - 1);
                         }
