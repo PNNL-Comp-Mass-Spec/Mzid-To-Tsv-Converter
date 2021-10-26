@@ -28,7 +28,7 @@ namespace MzidToTsvConverter
                                   programVersion.Major, programVersion.Minor, programVersion.Build, ConverterOptions.PROGRAM_DATE) +
                               Environment.NewLine + Environment.NewLine +
                               "E-mail: bryson.gibbons@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
-                              "Website: https://panomics.pnnl.gov/ or https://omics.pnl.gov",
+                              "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics",
 
                 UsageExamples = {
                     exeName + " Results.mzid",
