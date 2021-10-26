@@ -81,14 +81,14 @@ namespace MzidToTsvConverter
             Map(x => x.MSGFScore).Name("MSGFScore").Index(index++);
 
             // Write out EValues to 5 significant figures, using scientific notation below 0.0001
-            Map(x => x.SpecEValue).Name("SpecEValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.SpecEValue, 5, 1000)));
-            Map(x => x.EValue).Name("EValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.EValue, 5, 1000)));
+            Map(x => x.SpecEValue).Name("SpecEValue").Index(index++).Convert(x => ShowDecimalForZero(StringUtilities.ValueToString(x.Value.SpecEValue, 5, 1000)));
+            Map(x => x.EValue).Name("EValue").Index(index++).Convert(x => ShowDecimalForZero(StringUtilities.ValueToString(x.Value.EValue, 5, 1000)));
 
             // Write out QValue using 5 digits after the decimal, though use scientific notation below 0.00005
-            Map(x => x.QValue).Name("QValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.QValue, 5, 0.00005)));
+            Map(x => x.QValue).Name("QValue").Index(index++).Convert(x => ShowDecimalForZero(StringUtilities.ValueToString(x.Value.QValue, 5, 0.00005)));
 
             // ReSharper disable once RedundantAssignment
-            Map(x => x.PepQValue).Name("PepQValue").Index(index++).ConvertUsing(x => ShowDecimalForZero(StringUtilities.ValueToString(x.PepQValue, 5, 0.00005)));
+            Map(x => x.PepQValue).Name("PepQValue").Index(index++).Convert(x => ShowDecimalForZero(StringUtilities.ValueToString(x.Value.PepQValue, 5, 0.00005)));
         }
 
         private static string ShowDecimalForZero(string input)

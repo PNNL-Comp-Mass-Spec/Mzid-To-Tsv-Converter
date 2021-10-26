@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using CsvHelper;
+using CsvHelper.Configuration;
 using PRISM;
 using PSI_Interface.IdentData;
 
@@ -135,12 +136,17 @@ namespace MzidToTsvConverter
             var reader = new SimpleMZIdentMLReader(options.SkipDuplicateIds, s => Console.WriteLine("MZID PARSE ERROR: {0}", s));
             try
             {
-                using (var data = reader.ReadLowMem(mzidPath))
-                using (var csv = new CsvWriter(new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)), CultureInfo.CurrentCulture))
+                var configuration = new CsvConfiguration(CultureInfo.CurrentCulture)
                 {
-                    csv.Configuration.AllowComments = false;
-                    csv.Configuration.Delimiter = "\t";
-                    csv.Configuration.RegisterClassMap(new PeptideMatchMap(options.NoExtendedFields, options.AddGeneId));
+                    AllowComments = false,
+                    Delimiter = "\t"
+                };
+
+                using (var data = reader.ReadLowMem(mzidPath))
+                using (var writer = new StreamWriter(new FileStream(tsvFile.FullName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)))
+                using (var csv = new CsvWriter(writer, configuration))
+                {
+                    csv.Context.RegisterClassMap(new PeptideMatchMap(options.NoExtendedFields, options.AddGeneId));
 
                     // SPECIAL CASE:
                     // Certain versions of MS-GF+ output incorrect mzid files - the peptides referenced in the peptide_ref attribute in
