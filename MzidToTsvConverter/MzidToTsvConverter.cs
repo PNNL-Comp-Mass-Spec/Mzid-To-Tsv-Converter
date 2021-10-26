@@ -14,7 +14,7 @@ namespace MzidToTsvConverter
 {
     public class MzidToTsvConverter
     {
-        // Ignore Spelling: tsv
+        // Ignore Spelling: mzid, tsv
 
         /// <summary>
         /// Convert the .mzid file(s) specified by options.MzidPath
