@@ -6,7 +6,7 @@
     <RootNamespace>MzidToTsvConverter</RootNamespace>
     <AssemblyName>MzidToTsvConverter</AssemblyName>
     <PackageId>MzidToTsvConverter</PackageId>
-    <Version>1.4.6</Version>
+    <Version>1.4.7</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <Description>Converts mzid[.gz] files to the MS-GF+ tsv format (tab-separated values). Designed for MS-GF+ mzid files (looks for EValue and SpecEValue scores)</Description>
@@ -28,9 +28,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.5" />
-    <PackageReference Include="PRISM-Library" Version="2.6.23" />
-    <PackageReference Include="PSI_Interface" Version="2.3.1" />
+    <PackageReference Include="CsvHelper" Version="27.1.1" />
+    <PackageReference Include="PRISM-Library" Version="2.6.40" />
+    <PackageReference Include="PSI_Interface" Version="2.4.3" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)..\Readme.md&quot; &quot;$(TargetDir)&quot; /y /d" />
