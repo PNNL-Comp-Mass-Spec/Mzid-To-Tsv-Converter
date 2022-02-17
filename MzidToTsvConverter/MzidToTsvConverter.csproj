@@ -28,9 +28,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="27.1.1" />
-    <PackageReference Include="PRISM-Library" Version="2.6.40" />
-    <PackageReference Include="PSI_Interface" Version="2.4.3" />
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
+    <PackageReference Include="PRISM-Library" Version="2.6.48" />
+    <PackageReference Include="PSI_Interface" Version="2.5.69" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)..\Readme.md&quot; &quot;$(TargetDir)&quot; /y /d" />
