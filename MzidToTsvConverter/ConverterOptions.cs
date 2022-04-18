@@ -25,7 +25,7 @@ namespace MzidToTsvConverter
         /// <summary>
         /// Program build date
         /// </summary>
-        public const string PROGRAM_DATE = "2022-02-17";
+        public const string PROGRAM_DATE = "2022-04-18";
 
         public ConverterOptions()
         {
