@@ -17,6 +17,7 @@
     <RepositoryUrl>https://github.com/PNNL-Comp-Mass-Spec/Mzid-To-Tsv-Converter</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <Copyright>Copyright @ PNNL 2018</Copyright>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net462|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
