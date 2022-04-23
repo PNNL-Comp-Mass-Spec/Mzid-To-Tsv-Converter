@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using PRISM;
 
@@ -161,7 +162,7 @@ namespace MzidToTsvConverter
         /// <param name="filterThreshold"></param>
         public static bool FilterEnabled(double filterThreshold)
         {
-            return filterThreshold > 0 && filterThreshold < 1;
+            return filterThreshold is > 0 and < 1;
         }
 
         public static bool HasWildcard(string filePath)
