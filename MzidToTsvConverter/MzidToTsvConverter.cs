@@ -25,7 +25,7 @@ namespace MzidToTsvConverter
         {
             var fileCountConverted = 0;
 
-            if (options.HasWildcard(options.MzidPath))
+            if (ConverterOptions.HasWildcard(options.MzidPath))
             {
                 // Find matching files
                 var mzidFiles = PathUtils.FindFilesWildcard(options.MzidPath);
@@ -42,7 +42,7 @@ namespace MzidToTsvConverter
                     Console.WriteLine("Converting " + mzidFile.FullName);
 
                     string tsvPath;
-                    if (options.HasWildcard(options.TsvPath))
+                    if (ConverterOptions.HasWildcard(options.TsvPath))
                     {
                         tsvPath = options.AutoNameTsvFromMzid(mzidFile.FullName);
                     }
@@ -100,9 +100,9 @@ namespace MzidToTsvConverter
             string tsvPath,
             ConverterOptions options)
         {
-            var filterOnSpecEValue = options.FilterEnabled(options.MaxSpecEValue);
+            var filterOnSpecEValue = ConverterOptions.FilterEnabled(options.MaxSpecEValue);
             var filterOnEValue = options.MaxEValue > 0;
-            var filterOnQValue = options.FilterEnabled(options.MaxQValue);
+            var filterOnQValue = ConverterOptions.FilterEnabled(options.MaxQValue);
 
             if (string.IsNullOrWhiteSpace(tsvPath))
             {
@@ -362,7 +362,7 @@ namespace MzidToTsvConverter
             return true;
         }
 
-        private void CombineProteinNames(ConverterOptions options, IReadOnlyList<PeptideMatch> matches)
+        private static void CombineProteinNames(ConverterOptions options, IReadOnlyList<PeptideMatch> matches)
         {
             const int MAX_LIST_LENGTH = 100000;
 

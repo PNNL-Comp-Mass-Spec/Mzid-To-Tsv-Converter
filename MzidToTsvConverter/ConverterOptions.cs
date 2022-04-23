@@ -159,12 +159,12 @@ namespace MzidToTsvConverter
         /// Returns true if filterThreshold is greater than 0 but less than 1
         /// </summary>
         /// <param name="filterThreshold"></param>
-        public bool FilterEnabled(double filterThreshold)
+        public static bool FilterEnabled(double filterThreshold)
         {
             return filterThreshold > 0 && filterThreshold < 1;
         }
 
-        public bool HasWildcard(string filePath)
+        public static bool HasWildcard(string filePath)
         {
             return filePath.Contains("*") || filePath.Contains("?");
         }
@@ -305,7 +305,9 @@ namespace MzidToTsvConverter
                     {
                         // Assure that the directory exists and auto-define the name
                         var tsvDirectory = new DirectoryInfo(TsvPath);
+
                         AssureDirectoryExists(tsvDirectory);
+
                         if (HasWildcard(MzidPath))
                         {
                             TsvPath = tsvDirectory.FullName;
@@ -323,7 +325,7 @@ namespace MzidToTsvConverter
             return true;
         }
 
-        private void AssureDirectoryExists(DirectoryInfo directoryInfo)
+        private static void AssureDirectoryExists(DirectoryInfo directoryInfo)
         {
             if (directoryInfo == null || directoryInfo.Exists)
                 return;
@@ -333,10 +335,11 @@ namespace MzidToTsvConverter
             Console.WriteLine();
         }
 
-        private string GetParentDirectoryPath(string filePath)
+        private static string GetParentDirectoryPath(string filePath)
         {
             // Remove all text after the last \ or /
             var lastDirectorySeparator = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+
             if (lastDirectorySeparator > 0)
             {
                 return filePath.Substring(0, lastDirectorySeparator);
