@@ -290,7 +290,7 @@ namespace MzidToTsvConverter
                         // TsvPath has a file name (or path to a file)
                         // Assure that the file's parent directory exists
                         FileInfo tsvFile;
-                        if (TsvPath.IndexOf(Path.DirectorySeparatorChar) >= 0 || mzidFileDirectory == null)
+                        if (TsvPath.Contains(Path.DirectorySeparatorChar) || mzidFileDirectory == null)
                         {
                             tsvFile = new FileInfo(TsvPath);
                         }
