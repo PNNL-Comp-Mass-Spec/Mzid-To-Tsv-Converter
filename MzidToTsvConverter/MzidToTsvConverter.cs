@@ -84,8 +84,7 @@ namespace MzidToTsvConverter
                 return fileCountConverted > 0;
             }
 
-            var successOneFile = ConvertToTsv(options.MzidPath, options.TsvPath, options);
-            return successOneFile;
+            return ConvertToTsv(options.MzidPath, options.TsvPath, options);
         }
 
         /// <summary>
