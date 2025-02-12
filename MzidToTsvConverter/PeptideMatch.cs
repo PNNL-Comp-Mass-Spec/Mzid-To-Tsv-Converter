@@ -6,7 +6,7 @@ namespace MzidToTsvConverter
 {
     public class PeptideMatch
     {
-        // Ignore Spelling: FragMethod, DeNovo
+        // Ignore Spelling: DeNovo, frag, mzid, novo, tsv
 
         public const double C = 12.0f;
         public const double C13 = 13.00335483;

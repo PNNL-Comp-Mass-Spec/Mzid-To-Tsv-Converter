@@ -8,7 +8,7 @@ namespace MzidToTsvConverter
 {
     public static class Program
     {
-        // Ignore Spelling: Bryson, Conf
+        // Ignore Spelling: Bryson, Conf, mzid, tsv
 
         private static int Main(string[] args)
         {
