@@ -11,6 +11,8 @@ namespace MzidToTsvConverter
     {
         // Ignore Spelling: delim, mzid, ne, sd, skipDup, sp, SwissProt, tsv, UniProt
 
+        // ReSharper disable once GrammarMistakeInComment
+
         /// <summary>
         /// Default RegEx for matching gene names
         /// Supports the UniProt/SwissProt format, extracting just the gene name and not the species
@@ -28,6 +30,9 @@ namespace MzidToTsvConverter
         /// </summary>
         public const string PROGRAM_DATE = "2022-11-22";
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ConverterOptions()
         {
             MzidPath = string.Empty;

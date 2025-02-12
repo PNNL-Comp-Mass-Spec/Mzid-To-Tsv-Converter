@@ -287,7 +287,7 @@ namespace MzidToTsvConverter
                     {
                         CombineProteinNames(options, matches);
 
-                        // The first item in matches already lists all of the protein names; remove all remaining matches.
+                        // The first item in matches already lists the protein names; remove all remaining matches.
                         matches.RemoveRange(1, matches.Count - 1);
                     }
 
@@ -374,6 +374,8 @@ namespace MzidToTsvConverter
 
             foreach (var item in matches)
             {
+                // ReSharper disable once CanSimplifySetAddingWithSingleCall
+
                 if (!proteinNames.Contains(item.Protein))
                 {
                     proteinNames.Add(item.Protein);
