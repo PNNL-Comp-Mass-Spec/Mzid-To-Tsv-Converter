@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using PRISM;
 
@@ -28,7 +27,7 @@ namespace MzidToTsvConverter
         /// <summary>
         /// Program build date
         /// </summary>
-        public const string PROGRAM_DATE = "2022-11-22";
+        public const string PROGRAM_DATE = "2025-02-11";
 
         /// <summary>
         /// Constructor
@@ -138,7 +137,7 @@ namespace MzidToTsvConverter
         /// </summary>
         public bool IsDirectory { get; private set; }
 
-        public List<string> MzidPaths { get; } = new List<string>();
+        public List<string> MzidPaths { get; } = new();
 
         /// <summary>
         /// RegEx matcher for extracting gene name from protein name and/or protein description
@@ -295,7 +294,7 @@ namespace MzidToTsvConverter
                         // TsvPath has a file name (or path to a file)
                         // Assure that the file's parent directory exists
                         FileInfo tsvFile;
-                        if (TsvPath.Contains(Path.DirectorySeparatorChar) || mzidFileDirectory == null)
+                        if (TsvPath.IndexOf(Path.DirectorySeparatorChar) >= 0 || mzidFileDirectory == null)
                         {
                             tsvFile = new FileInfo(TsvPath);
                         }
