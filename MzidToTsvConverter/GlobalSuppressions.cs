@@ -7,4 +7,5 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Require class instances to use this method", Scope = "member", Target = "~M:MzidToTsvConverter.MzidToTsvConverter.ConvertToTsv(System.String,System.String,MzidToTsvConverter.ConverterOptions)~System.Boolean")]
 [assembly: SuppressMessage("Readability", "RCS1123:Add parentheses when necessary.", Justification = "Parentheses not needed", Scope = "member", Target = "~P:MzidToTsvConverter.PeptideMatch.PrecursorErrorPpm")]
-[assembly: SuppressMessage("Usage", "RCS1146:Use conditional access.", Justification = "Leave for readability", Scope = "member", Target = "~M:MzidToTsvConverter.ConverterOptions.AssureDirectoryExists(System.IO.DirectoryInfo)")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "Leave as-is for readability", Scope = "member", Target = "~P:MzidToTsvConverter.ConverterOptions.MzidPaths")]
+[assembly: SuppressMessage("Usage", "RCS1146:Use conditional access.", Justification = "Leave as-is for readability", Scope = "member", Target = "~M:MzidToTsvConverter.ConverterOptions.AssureDirectoryExists(System.IO.DirectoryInfo)")]
